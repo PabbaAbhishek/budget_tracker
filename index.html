@@ -149,58 +149,88 @@
 
         .balance-section {
             background: #f8f9fa;
-            padding: 22px 25px;
+            padding: 18px 25px;
             text-align: center;
         }
 
         .balance-label { font-size: 12px; color: #6c757d; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
-        .balance-amount { font-size: 36px; font-weight: 700; color: #28a745; font-family: 'DM Mono', monospace; }
+        .balance-amount { font-size: 34px; font-weight: 700; color: #28a745; font-family: 'DM Mono', monospace; }
         .balance-amount.negative { color: #dc3545; }
 
         .income-expense-row {
             display: flex;
             justify-content: space-around;
-            margin-top: 15px;
+            margin-top: 12px;
         }
 
         .income-expense-label { font-size: 11px; color: #6c757d; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .income-expense-value { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
+        .income-expense-value { font-size: 17px; font-weight: 700; font-family: 'DM Mono', monospace; }
         .income-value { color: #28a745; }
         .expense-value { color: #dc3545; }
 
-        .chart-section { padding: 20px; text-align: center; }
+        /* Chart type toggle */
+        .chart-type-toggle {
+            display: flex;
+            background: #f0f0f6;
+            border-radius: 12px;
+            padding: 3px;
+            margin: 0 auto 16px;
+            width: fit-content;
+            gap: 2px;
+        }
+        .chart-toggle-btn {
+            padding: 8px 28px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.25s;
+        }
+        .chart-toggle-btn.active {
+            background: white;
+            color: #495057;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .chart-toggle-btn.active.expense-mode { color: #dc3545; }
+        .chart-toggle-btn.active.income-mode { color: #28a745; }
+
+        .chart-section { padding: 16px 16px 0; text-align: center; }
 
         .chart-container {
-            width: 260px;
-            height: 260px;
-            margin: 0 auto 15px;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 12px;
             position: relative;
         }
 
         canvas { max-width: 100%; cursor: pointer; }
 
-        .chart-legend { margin-top: 15px; padding: 0 10px; }
+        .chart-legend { padding: 0 4px 16px; }
 
         .legend-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
+            padding: 11px 12px;
             margin-bottom: 6px;
             background: #f8f9fa;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
 
-        .legend-item:hover { background: #e9ecef; transform: translateX(4px); }
+        .legend-item:hover { background: #e9ecef; transform: translateX(3px); }
 
         .legend-left { display: flex; align-items: center; gap: 10px; }
-        .legend-color { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; }
-        .legend-name { font-weight: 600; color: #495057; font-size: 14px; }
-        .legend-right { display: flex; align-items: center; gap: 8px; }
-        .legend-percentage { font-size: 12px; color: #6c757d; }
-        .legend-amount { font-weight: 600; color: #495057; font-family: 'DM Mono', monospace; font-size: 13px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .legend-name { font-weight: 600; color: #495057; font-size: 13px; }
+        .legend-right { display: flex; align-items: center; gap: 10px; }
+        .legend-percentage { font-size: 11px; color: #6c757d; background: #e9ecef; padding: 2px 7px; border-radius: 10px; font-weight: 600; }
+        .legend-amount { font-weight: 700; color: #495057; font-family: 'DM Mono', monospace; font-size: 13px; }
 
         .add-transaction-buttons {
             display: flex;
@@ -299,7 +329,7 @@
             transition: all 0.3s;
         }
 
-        .trend-btn:hover { background: #5568d3; }
+        /* trend-btn removed - trend is now inline */
 
         /* Modals */
         .modal {
@@ -386,42 +416,109 @@
             border-color: #667eea;
         }
 
-        .category-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+        /* Category selector in transaction modal */
+        .category-selector-wrapper {
             margin-bottom: 20px;
         }
+        .category-row-top {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .category-row-scroll {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+        .category-row-scroll.open {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .show-more-btn {
+            width: 100%;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1.5px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+        }
+        .show-more-btn:hover { background: #f0f3ff; }
 
         .category-btn {
             background: white;
             border: 2px solid #e9ecef;
             border-radius: 12px;
-            padding: 12px 8px;
+            padding: 0;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-align: center;
-            position: relative;
+            width: 100%;
+            height: 76px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-sizing: border-box;
         }
 
         .category-btn:hover, .category-btn.selected { border-color: #667eea; background: #f0f3ff; }
 
-        .category-icon { font-size: 28px; margin-bottom: 4px; }
-        .category-name { font-size: 10px; color: #495057; font-weight: 500; }
+        .category-icon { font-size: 26px; line-height: 1; display: block; }
+        .category-name { font-size: 10px; color: #495057; font-weight: 500; line-height: 1; display: block; padding: 0 2px; }
 
         .add-category-btn {
             background: #f8f9fa;
             border: 2px dashed #dee2e6;
             border-radius: 12px;
-            padding: 12px 8px;
+            padding: 0;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-align: center;
+            width: 100%;
+            height: 76px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-sizing: border-box;
         }
 
         .add-category-btn:hover { border-color: #667eea; background: #f0f3ff; }
-        .add-category-btn .category-icon { font-size: 22px; color: #adb5bd; }
+        .add-category-btn .category-icon { font-size: 20px; color: #adb5bd; }
         .add-category-btn .category-name { font-size: 10px; color: #adb5bd; }
+
+        /* Inline trend inside category expand */
+        .category-trend-inline {
+            background: #f0f3ff;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .category-trend-inline canvas { width: 100% !important; display: block; }
+
+        /* Category edit button in manage page */
+        .cat-edit-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .cat-edit-btn:hover { opacity: 1; }
 
         .amount-display {
             font-size: 42px;
@@ -583,7 +680,6 @@
     <div class="tab-navigation">
         <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
         <button class="tab-btn" onclick="switchTab('categories', this)">Categories</button>
-        <button class="tab-btn" onclick="switchTab('transactions', this)">Transactions</button>
     </div>
 
     <div class="tab-content">
@@ -603,6 +699,10 @@
                 </div>
             </div>
             <div class="chart-section">
+                <div class="chart-type-toggle">
+                    <button class="chart-toggle-btn active" id="chartExpenseBtn" onclick="setChartMode('expense', this)">Expenses</button>
+                    <button class="chart-toggle-btn" id="chartIncomeBtn" onclick="setChartMode('income', this)">Income</button>
+                </div>
                 <div class="chart-container">
                     <canvas id="expenseChart"></canvas>
                 </div>
@@ -612,10 +712,6 @@
 
         <div id="categoriesTab" class="tab-page" style="display:none;">
             <div class="category-list" id="categoryList"></div>
-        </div>
-
-        <div id="transactionsTab" class="tab-page" style="display:none;">
-            <div class="transactions-list" id="transactionsList"></div>
         </div>
     </div>
 
@@ -640,7 +736,11 @@
 
         <div class="input-group">
             <label>Category</label>
-            <div class="category-grid" id="categorySelector"></div>
+            <div class="category-selector-wrapper">
+                <div class="category-row-top" id="categoryRowTop"></div>
+                <button class="show-more-btn" id="showMoreBtn" onclick="toggleMoreCategories()">▼ Show more</button>
+                <div class="category-row-scroll" id="categoryRowScroll"></div>
+            </div>
         </div>
 
         <div class="input-group">
@@ -683,18 +783,8 @@
     </div>
 </div>
 
-<!-- Trend Modal -->
-<div class="modal" id="trendModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="trendTitle">Trend</h3>
-            <button class="close-btn" onclick="closeTrendModal()">×</button>
-        </div>
-        <div class="trend-chart-wrapper">
-            <canvas id="trendChart" style="width:100%;height:200px;"></canvas>
-        </div>
-    </div>
-</div>
+<!-- Trend modal removed - trend is now inline in category expand -->
+
 
 <!-- Settings Modal -->
 <div class="modal" id="settingsModal">
@@ -713,11 +803,11 @@
     </div>
 </div>
 
-<!-- Create Custom Category Modal -->
+<!-- Create/Edit Category Modal -->
 <div class="modal" id="customCategoryModal">
     <div class="modal-content">
         <div class="modal-header">
-            <h3>Create Category</h3>
+            <h3 id="customCatModalTitle">Create Category</h3>
             <button class="close-btn" onclick="closeCustomCategoryModal()">×</button>
         </div>
 
@@ -731,12 +821,16 @@
             <div class="emoji-grid" id="emojiGrid"></div>
         </div>
 
-        <div class="type-selector">
-            <button class="type-btn expense active" id="customCatExpenseBtn" onclick="setCustomCatType('expense')">Expense</button>
-            <button class="type-btn income" id="customCatIncomeBtn" onclick="setCustomCatType('income')">Income</button>
+        <div class="input-group">
+            <label>Type</label>
+            <div class="type-selector">
+                <button class="type-btn expense active" id="customCatExpenseBtn" onclick="setCustomCatType('expense')">Expense</button>
+                <button class="type-btn income" id="customCatIncomeBtn" onclick="setCustomCatType('income')">Income</button>
+            </div>
         </div>
 
-        <button class="save-btn" onclick="saveCustomCategory()">Create Category</button>
+        <button class="save-btn" onclick="saveCustomCategory()" id="customCatSaveBtn">Create Category</button>
+        <button class="delete-btn" id="customCatDeleteBtn" style="display:none;" onclick="deleteCustomCategory()">🗑️ Delete Category</button>
     </div>
 </div>
 
@@ -752,6 +846,18 @@ let editingTransaction = null;
 let currentTab = 'overview';
 let selectedEmoji = '📦';
 let customCatType = 'expense';
+let chartMode = 'expense'; // 'expense' | 'income'
+
+// ── Number formatting (Indian) ────────────────────────────────────────────────
+function formatINR(n) {
+    // Format as Indian: 12,34,567
+    const s = Math.round(n).toString();
+    if (s.length <= 3) return '₹' + s;
+    const last3 = s.slice(-3);
+    const rest = s.slice(0, -3);
+    const formatted = rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + last3;
+    return '₹' + formatted;
+}
 
 // ── Default categories ────────────────────────────────────────────────────────
 const defaultCategories = {
@@ -791,8 +897,8 @@ function getCategories() {
     if (!stored) return JSON.parse(JSON.stringify(defaultCategories));
     const custom = JSON.parse(stored);
     return {
-        expense: [...defaultCategories.expense, ...custom.expense],
-        income: [...defaultCategories.income, ...custom.income]
+        expense: [...defaultCategories.expense, ...(custom.expense || [])],
+        income: [...defaultCategories.income, ...(custom.income || [])]
     };
 }
 
@@ -810,8 +916,14 @@ const emojiOptions = [
     '🏠','✈️','🎓','💊','🎵','🎬','🐾','⚽','🏋️','☕','🍕','🎂',
     '👕','💄','📱','💻','🔧','🚿','💡','📦','🌿','🎁','🏖️','🎪',
     '🎯','🧘','🚀','🌍','🎨','🎻','📷','🏆','🛒','🎤','🍷','🧴',
-    '🏡','🧹','🐕','📝','📊','🌸','🍀','🎲','🛋️','🎒','💎','🧺'
+    '🏡','🧹','🐕','📝','📊','🌸','🍀','🎲','🛋️','🎒','💎','🧺',
+    '🍔','🚗','⚕️','📄','🤲','💸','🤝','📉','✍️','💼','🏢','🎁',
+    '💰','📈','🛍️','🍷','💳','🏥','🎮','🎸','🏄','🧸','🌮','🍜'
 ];
+
+let editingCategoryId = null;
+let editingCategoryType = null;
+let showingMoreCategories = false;
 
 function renderEmojiGrid() {
     const grid = document.getElementById('emojiGrid');
@@ -832,31 +944,115 @@ function setCustomCatType(type) {
     document.getElementById('customCatIncomeBtn').classList.toggle('active', type === 'income');
 }
 
-function openCustomCategoryModal() {
-    selectedEmoji = '📦';
-    customCatType = 'expense';
-    document.getElementById('customCatName').value = '';
-    document.getElementById('customCatExpenseBtn').classList.add('active');
-    document.getElementById('customCatIncomeBtn').classList.remove('active');
+function openCustomCategoryModal(editId, editType) {
+    editingCategoryId = editId || null;
+    editingCategoryType = editType || null;
+
+    if (editId) {
+        // Edit mode
+        const cats = getCategories();
+        const cat = cats[editType]?.find(c => c.id === editId);
+        if (!cat) return;
+        document.getElementById('customCatModalTitle').textContent = 'Edit Category';
+        document.getElementById('customCatSaveBtn').textContent = 'Save Changes';
+        document.getElementById('customCatDeleteBtn').style.display = cat.custom ? 'block' : 'none';
+        document.getElementById('customCatName').value = cat.name;
+        selectedEmoji = cat.icon;
+        customCatType = editType;
+        // Lock type toggle when editing (can't change type)
+        document.getElementById('customCatExpenseBtn').disabled = true;
+        document.getElementById('customCatIncomeBtn').disabled = true;
+    } else {
+        // Create mode
+        document.getElementById('customCatModalTitle').textContent = 'Create Category';
+        document.getElementById('customCatSaveBtn').textContent = 'Create Category';
+        document.getElementById('customCatDeleteBtn').style.display = 'none';
+        document.getElementById('customCatName').value = '';
+        selectedEmoji = '📦';
+        customCatType = transactionType || 'expense';
+        document.getElementById('customCatExpenseBtn').disabled = false;
+        document.getElementById('customCatIncomeBtn').disabled = false;
+    }
+
+    document.getElementById('customCatExpenseBtn').classList.toggle('active', customCatType === 'expense');
+    document.getElementById('customCatIncomeBtn').classList.toggle('active', customCatType === 'income');
     renderEmojiGrid();
     document.getElementById('customCategoryModal').classList.add('active');
 }
 
 function closeCustomCategoryModal() {
     document.getElementById('customCategoryModal').classList.remove('active');
+    editingCategoryId = null;
+    editingCategoryType = null;
 }
 
 function saveCustomCategory() {
     const name = document.getElementById('customCatName').value.trim();
     if (!name) { alert('Please enter a category name'); return; }
 
-    const id = 'custom_' + Date.now();
-    const custom = getCustomCategories();
-    custom[customCatType].push({ id, name, icon: selectedEmoji, custom: true });
-    saveCustomCategories(custom);
+    if (editingCategoryId) {
+        // Edit existing — default or custom
+        const isDefault = defaultCategories[editingCategoryType]?.some(c => c.id === editingCategoryId);
+        const custom = getCustomCategories();
+
+        if (isDefault) {
+            // Store override for default category
+            if (!custom.overrides) custom.overrides = {};
+            custom.overrides[editingCategoryId] = { name, icon: selectedEmoji };
+        } else {
+            // Edit custom category
+            const arr = custom[editingCategoryType] || [];
+            const idx = arr.findIndex(c => c.id === editingCategoryId);
+            if (idx > -1) { arr[idx].name = name; arr[idx].icon = selectedEmoji; }
+        }
+
+        // Also update all existing transactions with this category
+        const all = loadTransactions();
+        all.forEach(t => {
+            if (t.category === editingCategoryId) {
+                t.categoryName = name;
+                t.categoryIcon = selectedEmoji;
+            }
+        });
+        saveTransactionsToStorage(all);
+        saveCustomCategories(custom);
+    } else {
+        // Create new
+        const id = 'custom_' + Date.now();
+        const custom = getCustomCategories();
+        if (!custom[customCatType]) custom[customCatType] = [];
+        custom[customCatType].push({ id, name, icon: selectedEmoji, custom: true });
+        saveCustomCategories(custom);
+    }
 
     closeCustomCategoryModal();
     renderCategorySelector();
+    refreshAll();
+}
+
+function deleteCustomCategory() {
+    if (!editingCategoryId) return;
+    if (!confirm('Delete this category? Existing transactions will keep their category label.')) return;
+    const custom = getCustomCategories();
+    custom[editingCategoryType] = (custom[editingCategoryType] || []).filter(c => c.id !== editingCategoryId);
+    saveCustomCategories(custom);
+    closeCustomCategoryModal();
+    renderCategorySelector();
+    refreshAll();
+}
+
+// Merged getCategories that applies overrides
+function getCategories() {
+    const stored = localStorage.getItem('budgetCustomCategories');
+    const custom = stored ? JSON.parse(stored) : { expense: [], income: [] };
+    const overrides = custom.overrides || {};
+
+    const applyOverrides = (list) => list.map(c => overrides[c.id] ? { ...c, ...overrides[c.id] } : c);
+
+    return {
+        expense: [...applyOverrides(defaultCategories.expense), ...(custom.expense || [])],
+        income: [...applyOverrides(defaultCategories.income), ...(custom.income || [])]
+    };
 }
 
 // ── Period / View logic ───────────────────────────────────────────────────────
@@ -936,11 +1132,19 @@ function switchTab(tab, btn) {
 
     document.getElementById('overviewTab').style.display = tab === 'overview' ? 'block' : 'none';
     document.getElementById('categoriesTab').style.display = tab === 'categories' ? 'block' : 'none';
-    document.getElementById('transactionsTab').style.display = tab === 'transactions' ? 'block' : 'none';
 
     if (tab === 'categories') renderCategoryList();
-    if (tab === 'transactions') renderTransactionsList();
     if (tab === 'overview') renderOverview();
+}
+
+// ── Chart mode toggle ─────────────────────────────────────────────────────────
+function setChartMode(mode, btn) {
+    chartMode = mode;
+    document.querySelectorAll('.chart-toggle-btn').forEach(b => {
+        b.classList.remove('active', 'expense-mode', 'income-mode');
+    });
+    btn.classList.add('active', mode === 'expense' ? 'expense-mode' : 'income-mode');
+    renderChart(getPeriodTransactions());
 }
 
 // ── Overview ──────────────────────────────────────────────────────────────────
@@ -950,12 +1154,18 @@ function renderOverview() {
     const expense = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
     const balance = income - expense;
 
-    document.getElementById('totalIncome').textContent = '₹' + income.toFixed(0);
-    document.getElementById('totalExpense').textContent = '₹' + expense.toFixed(0);
+    document.getElementById('totalIncome').textContent = formatINR(income);
+    document.getElementById('totalExpense').textContent = formatINR(expense);
 
     const balEl = document.getElementById('balanceAmount');
-    balEl.textContent = '₹' + balance.toFixed(0);
+    balEl.textContent = formatINR(balance);
     balEl.className = balance >= 0 ? 'balance-amount' : 'balance-amount negative';
+
+    // Keep toggle button states in sync
+    document.getElementById('chartExpenseBtn').classList.toggle('active', chartMode === 'expense');
+    document.getElementById('chartExpenseBtn').classList.toggle('expense-mode', chartMode === 'expense');
+    document.getElementById('chartIncomeBtn').classList.toggle('active', chartMode === 'income');
+    document.getElementById('chartIncomeBtn').classList.toggle('income-mode', chartMode === 'income');
 
     renderChart(transactions);
 }
@@ -963,36 +1173,54 @@ function renderOverview() {
 function renderChart(transactions) {
     const canvas = document.getElementById('expenseChart');
     const ctx = canvas.getContext('2d');
-    const expenses = transactions.filter(t => t.type === 'expense');
+    const filtered = transactions.filter(t => t.type === chartMode);
 
-    canvas.width = 260;
-    canvas.height = 260;
+    canvas.width = 220;
+    canvas.height = 220;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (expenses.length === 0) {
+    if (filtered.length === 0) {
         ctx.fillStyle = '#adb5bd';
         ctx.font = '13px DM Sans, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('No expenses to show', canvas.width / 2, canvas.height / 2);
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No ' + chartMode + ' data', canvas.width / 2, canvas.height / 2);
         document.getElementById('chartLegend').innerHTML = '';
         return;
     }
 
+    // Aggregate by category
     const catTotals = {};
     const categories = getCategories();
-    expenses.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
+    filtered.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
 
-    const data = Object.entries(catTotals).map(([catId, amount]) => {
-        const cat = categories.expense.find(c => c.id === catId) || categories.income.find(c => c.id === catId) || { name: catId, icon: '📦' };
+    // Sort by amount descending
+    let data = Object.entries(catTotals).map(([catId, amount]) => {
+        const cat = categories[chartMode]?.find(c => c.id === catId)
+                 || categories.expense.find(c => c.id === catId)
+                 || categories.income.find(c => c.id === catId)
+                 || { name: catId, icon: '📦' };
         return { id: catId, category: cat.name, icon: cat.icon, amount };
-    });
+    }).sort((a, b) => b.amount - a.amount);
 
     const total = data.reduce((s, d) => s + d.amount, 0);
-    const cx = canvas.width / 2, cy = canvas.height / 2, r = 115;
-    const colors = ['#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#E74C3C','#95A5A6','#00B894','#FD79A8'];
 
+    // For the PIE: show top 3, group rest as "Others"
+    const TOP_N = 3;
+    let pieData = data.slice(0, TOP_N);
+    if (data.length > TOP_N) {
+        const othersTotal = data.slice(TOP_N).reduce((s, d) => s + d.amount, 0);
+        pieData.push({ id: '__others__', category: 'Others', icon: '📦', amount: othersTotal });
+    }
+
+    const colors = chartMode === 'expense'
+        ? ['#FF6384', '#FF9F40', '#FFCE56', '#c8c8c8']
+        : ['#36A2EB', '#4BC0C0', '#9966FF', '#c8c8c8'];
+
+    const cx = canvas.width / 2, cy = canvas.height / 2, r = 100;
     let angle = -Math.PI / 2;
-    data.forEach((item, i) => {
+
+    pieData.forEach((item, i) => {
         const slice = (item.amount / total) * 2 * Math.PI;
         ctx.fillStyle = colors[i % colors.length];
         ctx.beginPath();
@@ -1001,39 +1229,58 @@ function renderChart(transactions) {
         ctx.closePath();
         ctx.fill();
 
-        if (slice > 0.1) {
-            const pct = ((item.amount / total) * 100).toFixed(0);
-            const la = angle + slice / 2;
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 14px DM Sans, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(pct + '%', cx + Math.cos(la) * r * 0.68, cy + Math.sin(la) * r * 0.68);
-        }
+        // White separator line
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+        ctx.stroke();
+
         angle += slice;
     });
 
-    document.getElementById('chartLegend').innerHTML = data.map((item, i) => `
+    // Draw donut hole
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r * 0.42, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Center label
+    ctx.fillStyle = chartMode === 'expense' ? '#dc3545' : '#28a745';
+    ctx.font = 'bold 11px DM Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(chartMode === 'expense' ? 'SPENT' : 'EARNED', cx, cy - 10);
+    ctx.fillStyle = '#495057';
+    ctx.font = 'bold 13px DM Mono, monospace';
+    ctx.fillText(formatINR(total), cx, cy + 10);
+
+    // Legend: ALL categories sorted highest to lowest (not just top 3)
+    document.getElementById('chartLegend').innerHTML = data.map((item, i) => {
+        const color = i < TOP_N ? colors[i] : '#c8c8c8';
+        return `
         <div class="legend-item" onclick="jumpToCategory('${item.id}')">
             <div class="legend-left">
-                <div class="legend-color" style="background:${colors[i % colors.length]}"></div>
+                <div class="legend-color" style="background:${color};border-radius:50%;"></div>
                 <span class="legend-name">${item.icon} ${item.category}</span>
             </div>
             <div class="legend-right">
                 <span class="legend-percentage">${((item.amount/total)*100).toFixed(1)}%</span>
-                <span class="legend-amount">₹${item.amount.toFixed(0)}</span>
+                <span class="legend-amount">${formatINR(item.amount)}</span>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 function jumpToCategory(categoryId) {
+    if (categoryId === '__others__') return;
     const tabBtns = document.querySelectorAll('.tab-btn');
     switchTab('categories', tabBtns[1]);
     setTimeout(() => {
         const el = document.querySelector(`[data-category="${categoryId}"]`);
-        if (el) { el.scrollIntoView({ behavior: 'smooth' }); el.classList.add('expanded'); }
-    }, 100);
+        if (el) { el.scrollIntoView({ behavior: 'smooth' }); el.classList.add('expanded'); requestAnimationFrame(() => drawInlineTrend(categoryId)); }
+    }, 120);
 }
 
 // ── Categories tab ────────────────────────────────────────────────────────────
@@ -1070,16 +1317,19 @@ function renderCategoryList() {
                     </div>
                 </div>
                 <div class="category-header-right">
-                    <button class="trend-btn" onclick="event.stopPropagation(); showTrend('${cat.id}','${cat.name}','${cat.icon}')">📈 Trend</button>
+                    <button class="cat-edit-btn" onclick="event.stopPropagation(); openCustomCategoryModal('${cat.id}','${cat.type}')" title="Edit">✏️</button>
                     <div class="category-header-amount" style="color:${cat.type==='income'?'#28a745':'#dc3545'}">
-                        ${cat.type==='expense'?'−':'+'}₹${cat.total.toFixed(0)}
+                        ${cat.type==='expense'?'−':'+'}${formatINR(cat.total)}
                     </div>
                     <div class="category-expand-icon">▼</div>
                 </div>
             </div>
             <div class="category-transactions">
+                <div class="category-trend-inline">
+                    <canvas id="trendcanvas-${cat.id}" height="90" style="width:100%"></canvas>
+                </div>
                 ${cat.transactions.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(t => {
-                    const ds = new Date(t.date).toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+                    const ds = new Date(t.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year: (currentView==='year'||currentView==='all')?'numeric':undefined });
                     return `
                         <div class="transaction-item" onclick="editTransaction(${t.id})">
                             <div class="transaction-info">
@@ -1088,7 +1338,7 @@ function renderCategoryList() {
                                     ${t.description ? `<div class="transaction-description">${t.description}</div>` : ''}
                                 </div>
                             </div>
-                            <div class="transaction-amount ${t.type}">${t.type==='expense'?'−':'+'}₹${t.amount.toFixed(0)}</div>
+                            <div class="transaction-amount ${t.type}">${t.type==='expense'?'−':'+'}${formatINR(t.amount)}</div>
                         </div>`;
                 }).join('')}
             </div>
@@ -1097,8 +1347,83 @@ function renderCategoryList() {
 }
 
 function toggleCategory(id) {
-    document.querySelector(`[data-category="${id}"]`)?.classList.toggle('expanded');
+    const el = document.querySelector(`[data-category="${id}"]`);
+    if (!el) return;
+    const wasExpanded = el.classList.contains('expanded');
+    el.classList.toggle('expanded');
+    if (!wasExpanded) {
+        requestAnimationFrame(() => drawInlineTrend(id));
+    }
 }
+
+function drawInlineTrend(categoryId) {
+    const canvas = document.getElementById('trendcanvas-' + categoryId);
+    if (!canvas) return;
+
+    const periodTx = getPeriodTransactions().filter(t => t.category === categoryId);
+    const buckets = {};
+    periodTx.forEach(t => {
+        const d = new Date(t.date);
+        let key;
+        if (currentView === 'month') {
+            key = String(d.getDate()).padStart(2, '0');
+        } else if (currentView === 'quarter' || currentView === 'year') {
+            key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        } else {
+            key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        }
+        buckets[key] = (buckets[key] || 0) + t.amount;
+    });
+
+    const sortedKeys = Object.keys(buckets).sort();
+    const values = sortedKeys.map(k => buckets[k]);
+
+    const w = canvas.parentElement.offsetWidth - 24 || 280;
+    const h = 90;
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, w, h);
+
+    if (values.length === 0) {
+        ctx.fillStyle = '#adb5bd'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('No data', w/2, h/2); return;
+    }
+
+    const pad = { top: 12, right: 12, bottom: 12, left: 12 };
+    const cw = w - pad.left - pad.right;
+    const ch = h - pad.top - pad.bottom;
+    const maxV = Math.max(...values), minV = Math.min(...values), range = maxV - minV || 1;
+
+    const pts = values.map((v, i) => ({
+        x: pad.left + (values.length === 1 ? cw/2 : (i / (values.length-1)) * cw),
+        y: pad.top + ch - ((v - minV) / range) * ch
+    }));
+
+    const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + ch);
+    grad.addColorStop(0, 'rgba(102,126,234,0.25)');
+    grad.addColorStop(1, 'rgba(102,126,234,0.02)');
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pad.top + ch);
+    pts.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[pts.length-1].x, pad.top + ch);
+    ctx.closePath(); ctx.fillStyle = grad; ctx.fill();
+
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+        const cpx = (pts[i-1].x + pts[i].x) / 2;
+        ctx.bezierCurveTo(cpx, pts[i-1].y, cpx, pts[i].y, pts[i].x, pts[i].y);
+    }
+    ctx.strokeStyle = '#667eea'; ctx.lineWidth = 2; ctx.stroke();
+
+    pts.forEach(p => {
+        ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
+        ctx.fillStyle = '#667eea'; ctx.fill();
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5; ctx.stroke();
+    });
+}
+
+
 
 // ── Transactions tab ──────────────────────────────────────────────────────────
 function renderTransactionsList() {
@@ -1122,100 +1447,9 @@ function renderTransactionsList() {
                         ${t.description ? `<div class="transaction-description">${t.description}</div>` : ''}
                     </div>
                 </div>
-                <div class="transaction-amount ${t.type}">${t.type==='expense'?'−':'+'}₹${t.amount.toFixed(0)}</div>
+                <div class="transaction-amount ${t.type}">${t.type==='expense'?'−':'+'}${formatINR(t.amount)}</div>
             </div>`;
     }).join('');
-}
-
-// ── Trend chart (line) ────────────────────────────────────────────────────────
-function showTrend(categoryId, categoryName, categoryIcon) {
-    const all = loadTransactions();
-    const catTx = all.filter(t => t.category === categoryId);
-
-    const monthly = {};
-    catTx.forEach(t => {
-        const d = new Date(t.date);
-        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-        monthly[key] = (monthly[key] || 0) + t.amount;
-    });
-
-    const sortedKeys = Object.keys(monthly).sort();
-    const values = sortedKeys.map(k => monthly[k]);
-
-    document.getElementById('trendTitle').textContent = `${categoryIcon} ${categoryName}`;
-    document.getElementById('trendModal').classList.add('active');
-
-    requestAnimationFrame(() => {
-        const canvas = document.getElementById('trendChart');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = 340;
-        canvas.height = 200;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (values.length < 1) {
-            ctx.fillStyle = '#6c757d';
-            ctx.font = '13px DM Sans, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Not enough data', canvas.width / 2, canvas.height / 2);
-            return;
-        }
-
-        const pad = { top: 20, right: 20, bottom: 20, left: 20 };
-        const w = canvas.width - pad.left - pad.right;
-        const h = canvas.height - pad.top - pad.bottom;
-        const maxVal = Math.max(...values);
-        const minVal = Math.min(...values);
-        const range = maxVal - minVal || 1;
-
-        const points = values.map((v, i) => ({
-            x: pad.left + (values.length === 1 ? w/2 : (i / (values.length - 1)) * w),
-            y: pad.top + h - ((v - minVal) / range) * h
-        }));
-
-        // Draw gradient fill
-        const gradient = ctx.createLinearGradient(0, pad.top, 0, pad.top + h);
-        gradient.addColorStop(0, 'rgba(102,126,234,0.3)');
-        gradient.addColorStop(1, 'rgba(102,126,234,0.02)');
-
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, pad.top + h);
-        points.forEach(p => ctx.lineTo(p.x, p.y));
-        ctx.lineTo(points[points.length - 1].x, pad.top + h);
-        ctx.closePath();
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // Draw line
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (let i = 1; i < points.length; i++) {
-            // Smooth curve via bezier
-            const prev = points[i - 1];
-            const curr = points[i];
-            const cpx = (prev.x + curr.x) / 2;
-            ctx.bezierCurveTo(cpx, prev.y, cpx, curr.y, curr.x, curr.y);
-        }
-        ctx.strokeStyle = '#667eea';
-        ctx.lineWidth = 3;
-        ctx.lineJoin = 'round';
-        ctx.stroke();
-
-        // Draw dots
-        points.forEach(p => {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-            ctx.fillStyle = '#667eea';
-            ctx.fill();
-            ctx.strokeStyle = 'white';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        });
-    });
-}
-
-function closeTrendModal() {
-    document.getElementById('trendModal').classList.remove('active');
 }
 
 // ── Transaction modal ─────────────────────────────────────────────────────────
@@ -1276,20 +1510,52 @@ function setTransactionType(type, btn) {
     renderCategorySelector();
 }
 
-function renderCategorySelector() {
-    const grid = document.getElementById('categorySelector');
-    const cats = getCategories()[transactionType];
+// ── Category selector (show 6, rest in scrollable) ───────────────────────────
+function toggleMoreCategories() {
+    showingMoreCategories = !showingMoreCategories;
+    const scroll = document.getElementById('categoryRowScroll');
+    const btn = document.getElementById('showMoreBtn');
+    if (showingMoreCategories) {
+        scroll.classList.add('open');
+        btn.textContent = '▲ Show less';
+    } else {
+        scroll.classList.remove('open');
+        btn.textContent = '▼ Show more';
+    }
+}
 
-    grid.innerHTML = cats.map(cat => `
+function renderCategorySelector() {
+    const cats = getCategories()[transactionType];
+    const top6 = cats.slice(0, 6);
+    const rest = cats.slice(6);
+
+    const makeBtn = cat => `
         <div class="category-btn ${selectedCategory === cat.id ? 'selected' : ''}" onclick="selectCategory('${cat.id}')">
             <div class="category-icon">${cat.icon}</div>
             <div class="category-name">${cat.name}</div>
-        </div>
-    `).join('') + `
+        </div>`;
+
+    const addBtn = `
         <div class="add-category-btn" onclick="openCustomCategoryModal()">
             <div class="category-icon">➕</div>
             <div class="category-name">New</div>
         </div>`;
+
+    document.getElementById('categoryRowTop').innerHTML = top6.map(makeBtn).join('');
+    document.getElementById('categoryRowScroll').innerHTML = rest.map(makeBtn).join('') + addBtn;
+
+    const showMoreBtn = document.getElementById('showMoreBtn');
+    if (rest.length === 0) {
+        // No "more" — put the add button in top row, hide show-more
+        document.getElementById('categoryRowTop').innerHTML += addBtn;
+        showMoreBtn.style.display = 'none';
+        document.getElementById('categoryRowScroll').innerHTML = '';
+    } else {
+        showMoreBtn.style.display = 'block';
+        showMoreBtn.textContent = showingMoreCategories ? '▲ Show less' : `▼ ${rest.length} more`;
+        if (showingMoreCategories) document.getElementById('categoryRowScroll').classList.add('open');
+        else document.getElementById('categoryRowScroll').classList.remove('open');
+    }
 }
 
 function selectCategory(id) {
@@ -1511,7 +1777,6 @@ function parseCSV(text) {
 function refreshAll() {
     if (currentTab === 'overview') renderOverview();
     if (currentTab === 'categories') renderCategoryList();
-    if (currentTab === 'transactions') renderTransactionsList();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
