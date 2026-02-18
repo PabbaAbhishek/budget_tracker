@@ -49,6 +49,7 @@
         .icon-btn { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; opacity: 0.85; transition: all 0.2s; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); color: white; display: flex; align-items: center; justify-content: center; }
         .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .icon-btn:hover { opacity: 1; background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+        .currency-btn-code { font-size: 10px; font-weight: 700; letter-spacing: 0.4px; line-height: 1; font-family: 'DM Sans', sans-serif; }
         .view-selector { display: flex; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 3px; gap: 2px; margin: 0 0 12px; }
         .view-btn { flex: 1; padding: 7px 4px; border: none; background: transparent; color: rgba(255,255,255,0.75); font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; border-radius: 9px; transition: all 0.25s; }
         .view-btn.active { background: rgba(255,255,255,0.25); color: white; }
@@ -246,6 +247,11 @@
         @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
         .tx-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
         .tx-tag-badge { font-size: 9px; font-weight: 700; padding: 1px 7px; border-radius: 10px; color: white; letter-spacing: 0.3px; }
+        .currency-option-list { display: grid; gap: 8px; }
+        .currency-option-btn { width: 100%; border: 2px solid #e9ecef; background: #fff; border-radius: 10px; padding: 10px 12px; text-align: left; cursor: pointer; transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .currency-option-btn:hover { background: #f8f9fa; }
+        .currency-option-btn.active { border-color: #d4af37; background: #fffaf0; }
+        .currency-option-code { font-size: 12px; color: #6c757d; font-weight: 700; font-family: 'DM Sans', sans-serif; }
     </style>
 </head>
 <body>
@@ -254,6 +260,9 @@
         <div class="header-top">
             <h1 class="header-title">Ledgerly</h1>
             <div class="header-actions">
+                <button class="icon-btn" onclick="openCurrencyPicker()" aria-label="Select currency">
+                    <span class="currency-btn-code" id="currencyBtnCode">INR</span>
+                </button>
                 <button class="icon-btn" onclick="openSearch()" aria-label="Search">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.65" y1="16.65" x2="21" y2="21"></line></svg>
                 </button>
@@ -344,6 +353,14 @@
         <button class="calc-btn operator" style="width:100%;margin-bottom:14px;" onclick="calculateResult()">=</button>
         <button class="save-btn" onclick="saveTransaction()">Save Transaction</button>
         <button class="delete-btn" id="deleteBtn" style="display:none;" onclick="deleteTransaction()">🗑️ Delete Transaction</button>
+    </div>
+</div>
+
+<!-- Currency Modal -->
+<div class="modal" id="currencyModal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Select Currency</h3><button class="close-btn" onclick="closeCurrencyPicker()">×</button></div>
+        <div class="currency-option-list" id="currencyOptions"></div>
     </div>
 </div>
 
@@ -446,6 +463,17 @@ let bulkSelectedType = null;
 let searchShowAllResults = false;
 let lastSearchTotalMatches = 0;
 let editingTagId = null;
+const DISPLAY_CURRENCIES = [
+    { code: 'USD', symbol: '$', label: 'US Dollar' },
+    { code: 'INR', symbol: '₹', label: 'Indian Rupee' },
+    { code: 'EUR', symbol: '€', label: 'Euro' },
+    { code: 'JPY', symbol: '¥', label: 'Japanese Yen' },
+    { code: 'KRW', symbol: '₩', label: 'Korean Won' },
+    { code: 'GBP', symbol: '£', label: 'British Pound' },
+    { code: 'AUD', symbol: 'A$', label: 'Australian Dollar' },
+    { code: 'CAD', symbol: 'C$', label: 'Canadian Dollar' }
+];
+let selectedDisplayCurrency = getDisplayCurrency();
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg, d=2200) {
@@ -582,11 +610,58 @@ function getPeriodTransactions() {
     if(activeTagFilter) all=all.filter(t=>Array.isArray(t.tags)&&t.tags.includes(activeTagFilter));
     return all;
 }
+function getDisplayCurrency() {
+    const saved=(localStorage.getItem('budgetDisplayCurrency')||'INR').toUpperCase();
+    return DISPLAY_CURRENCIES.some(c=>c.code===saved) ? saved : 'INR';
+}
+function getCurrencyConfig(code=selectedDisplayCurrency) {
+    return DISPLAY_CURRENCIES.find(c=>c.code===code) || DISPLAY_CURRENCIES.find(c=>c.code==='INR');
+}
+function openCurrencyPicker() {
+    renderCurrencyOptions();
+    document.getElementById('currencyModal').classList.add('active');
+}
+function closeCurrencyPicker() { document.getElementById('currencyModal').classList.remove('active'); }
+function renderCurrencyOptions() {
+    const container=document.getElementById('currencyOptions');
+    if(!container) return;
+    container.innerHTML=DISPLAY_CURRENCIES.map(c=>`
+        <button class="currency-option-btn ${selectedDisplayCurrency===c.code?'active':''}" onclick="setDisplayCurrency('${c.code}')">
+            <span>${c.symbol} ${c.label}</span>
+            <span class="currency-option-code">${c.code}</span>
+        </button>
+    `).join('');
+}
+function updateCurrencyButton() {
+    const el=document.getElementById('currencyBtnCode');
+    if(el) el.textContent=selectedDisplayCurrency;
+}
+function setDisplayCurrency(code) {
+    if(!DISPLAY_CURRENCIES.some(c=>c.code===code)) return;
+    selectedDisplayCurrency=code;
+    localStorage.setItem('budgetDisplayCurrency',code);
+    updateCurrencyButton();
+    closeCurrencyPicker();
+    updateAmountDisplay();
+    refreshAll();
+    showToast(`Currency: ${code}`);
+}
 function formatINR(n) {
-    const s=Math.round(n).toString();
-    if(s.length<=3) return '₹'+s;
-    const last3=s.slice(-3), rest=s.slice(0,-3);
-    return '₹'+rest.replace(/\B(?=(\d{2})+(?!\d))/g,',')+','+last3;
+    const num=Number(n)||0;
+    const sign=num<0?'-':'';
+    const abs=Math.round(Math.abs(num)).toString();
+    const cfg=getCurrencyConfig();
+    let grouped='';
+    if(cfg.code==='INR'){
+        if(abs.length<=3) grouped=abs;
+        else {
+            const last3=abs.slice(-3), rest=abs.slice(0,-3);
+            grouped=rest.replace(/\B(?=(\d{2})+(?!\d))/g,',')+','+last3;
+        }
+    } else {
+        grouped=abs.replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    }
+    return `${sign}${cfg.symbol}${grouped}`;
 }
 
 // ── Change 4: Updated categories ─────────────────────────────────────────────
@@ -1005,7 +1080,7 @@ function calculateResult() {
     try{let e=currentExpression.replace(/×/g,'*').replace(/÷/g,'/');let r=Function('"use strict";return('+e+')')();currentAmount=r.toString();currentExpression=currentAmount;updateAmountDisplay();}catch(e){showToast('⚠️ Invalid expression');}
 }
 function clearAmount() { currentAmount='';currentExpression='';updateAmountDisplay(); }
-function updateAmountDisplay() { document.getElementById('amountDisplay').textContent='₹'+(currentExpression||'0'); }
+function updateAmountDisplay() { document.getElementById('amountDisplay').textContent=getCurrencyConfig().symbol+(currentExpression||'0'); }
 
 // ── Change 5: Save with proper validation popup ───────────────────────────────
 function saveTransaction() {
@@ -1256,6 +1331,7 @@ function refreshAll(){renderTagFilterBar();if(currentTab==='overview')renderOver
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 initializeDefaultTags();
+updateCurrencyButton();
 updatePeriodLabel(); renderTagFilterBar(); renderOverview();
 
 // PWA
@@ -1270,4 +1346,3 @@ if('serviceWorker' in navigator){
 </script>
 </body>
 </html>
-
