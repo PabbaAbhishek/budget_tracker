@@ -32,6 +32,7 @@
             max-width: 450px;
             width: 100%;
             overflow: hidden;
+            height: 95vh;
             max-height: 95vh;
             display: flex;
             flex-direction: column;
@@ -43,8 +44,8 @@
             text-align: center;
         }
         .header-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
-        .header-title { font-size: 22px; font-weight: 700; line-height: 1; margin: 0; text-align: left; white-space: nowrap; }
-        .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .header-title { font-size: 20px; font-weight: 700; line-height: 1.1; margin: 0; text-align: left; white-space: nowrap; color: #fff; opacity: 0.98; letter-spacing: 0.2px; }
+        .header-actions { display: flex; gap: 8px; flex-shrink: 0; position: static !important; }
         .icon-btn { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; opacity: 0.85; transition: all 0.2s; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); color: white; display: flex; align-items: center; justify-content: center; }
         .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .icon-btn:hover { opacity: 1; background: rgba(255,255,255,0.2); transform: translateY(-1px); }
@@ -174,8 +175,9 @@
             .add-transaction-buttons { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
         }
         /* Tag filter bar */
-        .tag-filter-bar { margin-top: 8px; min-height: 0; }
-        .tag-chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .tag-filter-bar { margin-top: 8px; min-height: 34px; }
+        .tag-chips { display: flex; flex-wrap: nowrap; gap: 6px; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .tag-chips::-webkit-scrollbar { display: none; }
         .tag-chip { padding: 4px 12px; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
         .tag-chip:hover { background: rgba(255,255,255,0.22); }
         .tag-chip.active { background: white; color: #495057; border-color: white; }
@@ -231,7 +233,7 @@
 <div class="app-container">
     <div class="header">
         <div class="header-top">
-            <h1 class="header-title">Personal Finance</h1>
+            <h1 class="header-title">Personal Finances</h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="openSearch()" aria-label="Search">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.65" y1="16.65" x2="21" y2="21"></line></svg>
@@ -1217,7 +1219,7 @@ updatePeriodLabel(); renderTagFilterBar(); renderOverview();
     document.getElementById('pwaManifest').href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
 })();
 if('serviceWorker' in navigator){
-    const sw=`const C='pft-v2';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([self.location.href])));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)));});`;
+    const sw=`const C='pft-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([self.location.href])));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)));});`;
     navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'}).catch(()=>{});
 }
 </script>
