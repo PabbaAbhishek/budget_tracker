@@ -44,10 +44,10 @@
             position: relative;
         }
         .header-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; }
-        .icon-btn { font-size: 20px; cursor: pointer; opacity: 0.8; transition: all 0.3s; background: none; border: none; color: white; }
-        .icon-btn:hover { opacity: 1; transform: scale(1.2); }
-        .header h1 { font-size: 22px; margin-bottom: 12px; font-weight: 700; }
-        .view-selector { display: flex; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 3px; gap: 2px; margin-bottom: 12px; }
+        .icon-btn { width: 34px; height: 34px; border-radius: 50%; cursor: pointer; opacity: 0.85; transition: all 0.2s; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22); color: white; display: flex; align-items: center; justify-content: center; }
+        .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .icon-btn:hover { opacity: 1; background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+        .view-selector { display: flex; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 3px; gap: 2px; margin: 10px 0 12px; }
         .view-btn { flex: 1; padding: 7px 4px; border: none; background: transparent; color: rgba(255,255,255,0.75); font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; border-radius: 9px; transition: all 0.25s; }
         .view-btn.active { background: rgba(255,255,255,0.25); color: white; }
         .period-navigator { display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; }
@@ -185,6 +185,13 @@
         .tag-color-picker { display: flex; gap: 10px; flex-wrap: wrap; }
         .color-swatch { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all 0.15s; }
         .color-swatch.selected { border-color: #333; transform: scale(1.15); }
+        .tag-manager-list { display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
+        .tag-manager-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 10px; border: 1px solid #e9ecef; border-radius: 10px; background: #f8f9fa; }
+        .tag-manager-name { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #495057; min-width: 0; }
+        .tag-manager-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .tag-manager-actions { display: flex; gap: 6px; }
+        .tag-mini-btn { padding: 4px 8px; border-radius: 8px; border: 1px solid #dee2e6; background: white; color: #495057; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .tag-mini-btn.danger { border-color: #dc3545; color: #dc3545; }
         .tag-active-banner { background: linear-gradient(135deg, #667eea22, #764ba222); border: 1.5px solid #667eea44; border-radius: 10px; padding: 8px 14px; font-size: 12px; color: #495057; display: flex; align-items: center; justify-content: space-between; margin: 8px 16px 0; }
         .tag-active-banner strong { color: #667eea; }
         .chart-tooltip { position: absolute; background: rgba(30,30,30,0.88); color: white; padding: 7px 12px; border-radius: 8px; font-size: 12px; font-family: 'DM Sans', sans-serif; pointer-events: none; display: none; white-space: nowrap; z-index: 10; transform: translate(-50%, -110%); }
@@ -222,10 +229,13 @@
 <div class="app-container">
     <div class="header">
         <div class="header-actions">
-            <button class="icon-btn" onclick="openSearch()">🔍</button>
-            <button class="icon-btn" onclick="openSettings()">⚙️</button>
+            <button class="icon-btn" onclick="openSearch()" aria-label="Search">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.65" y1="16.65" x2="21" y2="21"></line></svg>
+            </button>
+            <button class="icon-btn" onclick="openSettings()" aria-label="Settings">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.05V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-.4-1.05 1.7 1.7 0 0 0-1-.6 1.7 1.7 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.05-.4H2.9a2 2 0 1 1 0-4H3a1.7 1.7 0 0 0 1.05-.4 1.7 1.7 0 0 0 .6-1 1.7 1.7 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.05V2.9a2 2 0 1 1 4 0V3a1.7 1.7 0 0 0 .4 1.05 1.7 1.7 0 0 0 1 .6 1.7 1.7 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 .6 1 1.7 1.7 0 0 0 1.05.4h.09a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.05.4 1.7 1.7 0 0 0-.6 1z"></path></svg>
+            </button>
         </div>
-        <h1>💰 Personal Finance Tracker</h1>
         <div class="view-selector">
             <button class="view-btn active" onclick="setView('month',this)">Month</button>
             <button class="view-btn" onclick="setView('quarter',this)">Quarter</button>
@@ -315,7 +325,7 @@
 <div class="modal" id="searchModal">
     <div class="modal-content" style="max-height:90vh;">
         <div class="modal-header"><h3>🔍 Search</h3><button class="close-btn" onclick="closeSearch()">×</button></div>
-        <div class="input-group" style="margin-bottom:8px;"><input type="text" id="searchInput" placeholder="Search transactions..." oninput="runSearch()" autocomplete="off" style="font-size:16px;"></div>
+        <div class="input-group" style="margin-bottom:8px;"><input type="text" id="searchInput" placeholder="Search transactions..." oninput="runSearch(false)" onkeydown="handleSearchEnter(event)" autocomplete="off" style="font-size:16px;"></div>
         <div class="search-toolbar" id="searchToolbar" style="display:none;">
             <button class="search-select-all-btn" onclick="toggleSelectAll()">Select All</button>
             <button class="search-action-btn primary" onclick="openBulkEdit()" id="bulkEditBtn" style="display:none;">✏️ Edit</button>
@@ -346,10 +356,14 @@
 <!-- Tags Manager Modal -->
 <div class="modal" id="tagsManagerModal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Create Tag</h3><button class="close-btn" onclick="closeTagsManager()">×</button></div>
+        <div class="modal-header"><h3>Manage Tags</h3><button class="close-btn" onclick="closeTagsManager()">×</button></div>
         <div class="input-group"><label>Tag Name</label><input type="text" id="newTagName" placeholder="e.g. Vacation, Stocks" maxlength="24"></div>
         <div class="input-group"><label>Color</label><div class="tag-color-picker" id="tagColorPicker"></div></div>
-        <button class="save-btn" onclick="saveNewTag()">Create Tag</button>
+        <button class="save-btn" onclick="saveNewTag()" id="saveTagBtn">Create Tag</button>
+        <div class="input-group" style="margin-top:14px;">
+            <label>Existing Tags</label>
+            <div class="tag-manager-list" id="tagsManagerList"></div>
+        </div>
     </div>
 </div>
 
@@ -370,7 +384,7 @@
         <div class="modal-header"><h3 id="customCatModalTitle">Create Category</h3><button class="close-btn" onclick="closeCustomCategoryModal()">×</button></div>
         <div class="input-group"><label>Category Name</label><input type="text" id="customCatName" placeholder="e.g. Subscriptions" maxlength="20"></div>
         <div class="input-group"><label>Choose Icon</label><div class="emoji-grid" id="emojiGrid"></div></div>
-        <div class="input-group">
+        <div class="input-group" id="customCatTypeGroup">
             <label>Type</label>
             <div class="type-selector">
                 <button class="type-btn expense active" id="customCatExpenseBtn" onclick="setCustomCatType('expense')">Expense</button>
@@ -403,6 +417,9 @@ let searchSelectedIds = new Set();
 let searchResultIds = [];
 let lastSearchResults = [];
 let bulkSelectedType = null;
+let searchShowAllResults = false;
+let lastSearchTotalMatches = 0;
+let editingTagId = null;
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function showToast(msg, d=2200) {
@@ -413,14 +430,31 @@ function showToast(msg, d=2200) {
 
 // ── Tags storage ──────────────────────────────────────────────────────────────
 const TAG_COLORS = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e91e63','#00bcd4','#607d8b'];
+const DEFAULT_TAGS = [
+    { id:'tag_default_vacation', name:'Vacation', color:'#3498db' },
+    { id:'tag_default_marriage', name:'Marriage', color:'#e91e63' },
+    { id:'tag_default_kids', name:'Kids', color:'#2ecc71' },
+    { id:'tag_default_house', name:'House', color:'#e67e22' }
+];
 let selectedTagColor = TAG_COLORS[2];
 function getTags() { const s=localStorage.getItem('budgetTags'); return s?JSON.parse(s):[]; }
 function saveTags(t) { localStorage.setItem('budgetTags',JSON.stringify(t)); }
+function initializeDefaultTags() {
+    if(localStorage.getItem('budgetTagsInitialized')==='1') return;
+    const existing=getTags();
+    const names=new Set(existing.map(t=>(t.name||'').toLowerCase()));
+    DEFAULT_TAGS.forEach(t=>{ if(!names.has(t.name.toLowerCase())) existing.push({...t}); });
+    saveTags(existing);
+    localStorage.setItem('budgetTagsInitialized','1');
+}
 
 function openTagsManager() {
+    editingTagId = null;
     selectedTagColor = TAG_COLORS[2];
     document.getElementById('newTagName').value = '';
+    document.getElementById('saveTagBtn').textContent = 'Create Tag';
     renderTagColorPicker();
+    renderTagsManagerList();
     document.getElementById('tagsManagerModal').classList.add('active');
 }
 function closeTagsManager() { document.getElementById('tagsManagerModal').classList.remove('active'); }
@@ -434,9 +468,59 @@ function saveNewTag() {
     const name=document.getElementById('newTagName').value.trim();
     if(!name){showToast('⚠️ Enter a tag name');return;}
     const tags=getTags();
-    if(tags.find(t=>t.name.toLowerCase()===name.toLowerCase())){showToast('Tag already exists');return;}
-    tags.push({id:'tag_'+Date.now(),name,color:selectedTagColor});
-    saveTags(tags); closeTagsManager(); renderTagsSelector(); renderTagFilterBar();
+    if(tags.find(t=>t.name.toLowerCase()===name.toLowerCase()&&t.id!==editingTagId)){showToast('Tag already exists');return;}
+    if(editingTagId){
+        const i=tags.findIndex(t=>t.id===editingTagId);
+        if(i>-1){tags[i].name=name;tags[i].color=selectedTagColor;}
+    } else {
+        tags.push({id:'tag_'+Date.now(),name,color:selectedTagColor});
+    }
+    saveTags(tags);
+    editingTagId = null;
+    document.getElementById('newTagName').value = '';
+    document.getElementById('saveTagBtn').textContent = 'Create Tag';
+    selectedTagColor = TAG_COLORS[2];
+    renderTagColorPicker();
+    renderTagsManagerList();
+    renderTagsSelector();
+    renderTagFilterBar();
+}
+function editTag(id){
+    const tag=getTags().find(t=>t.id===id);
+    if(!tag)return;
+    editingTagId = id;
+    document.getElementById('newTagName').value = tag.name;
+    selectedTagColor = tag.color;
+    document.getElementById('saveTagBtn').textContent = 'Save Tag';
+    renderTagColorPicker();
+}
+function deleteTag(id){
+    const tags=getTags();
+    const tag=tags.find(t=>t.id===id);
+    if(!tag)return;
+    if(!confirm(`Delete tag "${tag.name}"?`))return;
+    saveTags(tags.filter(t=>t.id!==id));
+    if(activeTagFilter===id) activeTagFilter=null;
+    if(selectedTags.includes(id)) selectedTags=selectedTags.filter(tid=>tid!==id);
+    const txs=loadTransactions();
+    txs.forEach(t=>{ if(Array.isArray(t.tags)) t.tags=t.tags.filter(tid=>tid!==id); });
+    saveTransactionsToStorage(txs);
+    if(editingTagId===id){
+        editingTagId=null;
+        document.getElementById('newTagName').value='';
+        document.getElementById('saveTagBtn').textContent='Create Tag';
+    }
+    renderTagColorPicker();
+    renderTagsManagerList();
+    renderTagsSelector();
+    refreshAll();
+}
+function renderTagsManagerList(){
+    const el=document.getElementById('tagsManagerList');
+    if(!el)return;
+    const tags=getTags();
+    if(!tags.length){el.innerHTML='<div style="font-size:12px;color:#adb5bd;padding:8px 2px;">No tags yet</div>';return;}
+    el.innerHTML=tags.map(t=>`<div class="tag-manager-item"><div class="tag-manager-name"><span class="tag-manager-dot" style="background:${t.color}"></span><span>${t.name}</span></div><div class="tag-manager-actions"><button class="tag-mini-btn" onclick="editTag('${t.id}')">Edit</button><button class="tag-mini-btn danger" onclick="deleteTag('${t.id}')">Delete</button></div></div>`).join('');
 }
 function renderTagsSelector() {
     const tags=getTags(), el=document.getElementById('tagsSelector');
@@ -529,16 +613,14 @@ function openCustomCategoryModal(editId,editType) {
         document.getElementById('customCatDeleteBtn').style.display=cat.custom?'block':'none';
         document.getElementById('customCatName').value=cat.name;
         selectedEmoji=cat.icon; customCatType=editType;
-        document.getElementById('customCatExpenseBtn').disabled=true;
-        document.getElementById('customCatIncomeBtn').disabled=true;
+        document.getElementById('customCatTypeGroup').style.display='none';
     } else {
         document.getElementById('customCatModalTitle').textContent='Create Category';
         document.getElementById('customCatSaveBtn').textContent='Create Category';
         document.getElementById('customCatDeleteBtn').style.display='none';
         document.getElementById('customCatName').value=''; selectedEmoji='📦';
         customCatType=transactionType||'expense';
-        document.getElementById('customCatExpenseBtn').disabled=false;
-        document.getElementById('customCatIncomeBtn').disabled=false;
+        document.getElementById('customCatTypeGroup').style.display='block';
     }
     document.getElementById('customCatExpenseBtn').classList.toggle('active',customCatType==='expense');
     document.getElementById('customCatIncomeBtn').classList.toggle('active',customCatType==='income');
@@ -957,7 +1039,7 @@ function parseCSV(text){
 
 // ── Change 1: Search with multi-select ───────────────────────────────────────
 function openSearch(){
-    searchSelectedIds.clear();searchResultIds=[];lastSearchResults=[];
+    searchSelectedIds.clear();searchResultIds=[];lastSearchResults=[];searchShowAllResults=false;lastSearchTotalMatches=0;
     document.getElementById('searchInput').value='';
     document.getElementById('searchResults').innerHTML='<div class="search-empty">Start typing to search transactions</div>';
     document.getElementById('searchToolbar').style.display='none';
@@ -965,6 +1047,7 @@ function openSearch(){
     setTimeout(()=>document.getElementById('searchInput').focus(),100);
 }
 function closeSearch(){document.getElementById('searchModal').classList.remove('active');searchSelectedIds.clear();searchResultIds=[];}
+function handleSearchEnter(event){ if(event.key==='Enter'){ event.preventDefault(); runSearch(true); } }
 
 function updateSearchToolbar(){
     const count=searchSelectedIds.size, toolbar=document.getElementById('searchToolbar');
@@ -981,12 +1064,15 @@ function toggleSelectAll(){
     renderSearchResults(lastSearchResults); updateSearchToolbar();
 }
 
-function runSearch(){
+function runSearch(forceAll=searchShowAllResults){
+    searchShowAllResults=!!forceAll;
     const q=document.getElementById('searchInput').value.trim().toLowerCase();
     searchSelectedIds.clear(); searchResultIds=[];
     if(!q){document.getElementById('searchResults').innerHTML='<div class="search-empty">Start typing to search transactions</div>';document.getElementById('searchToolbar').style.display='none';return;}
     const all=loadTransactions(),tags=getTags();
-    const results=all.filter(t=>(t.categoryName||'').toLowerCase().includes(q)||(t.description||'').toLowerCase().includes(q)||(t.amount.toString()).includes(q)||(t.tags||[]).some(tid=>{const tag=tags.find(tg=>tg.id===tid);return tag&&tag.name.toLowerCase().includes(q);})).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,50);
+    const matches=all.filter(t=>(t.categoryName||'').toLowerCase().includes(q)||(t.description||'').toLowerCase().includes(q)||(t.amount.toString()).includes(q)||(t.tags||[]).some(tid=>{const tag=tags.find(tg=>tg.id===tid);return tag&&tag.name.toLowerCase().includes(q);})).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    lastSearchTotalMatches=matches.length;
+    const results=searchShowAllResults?matches:matches.slice(0,50);
     lastSearchResults=results; searchResultIds=results.map(r=>r.id);
     renderSearchResults(results); updateSearchToolbar();
 }
@@ -994,12 +1080,15 @@ function runSearch(){
 function renderSearchResults(results){
     const container=document.getElementById('searchResults'), tags=getTags();
     if(!results.length){container.innerHTML='<div class="search-empty">No transactions found</div>';return;}
-    container.innerHTML=results.map(t=>{
+    const hint=!searchShowAllResults&&lastSearchTotalMatches>50
+        ? `<div class="search-result-meta" style="padding:0 2px 8px;">Showing top 50 of ${lastSearchTotalMatches}. Press Enter to show all matches.</div>`
+        : '';
+    container.innerHTML=hint+results.map(t=>{
         const ds=new Date(t.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
         const txTags=(t.tags||[]).map(tid=>{const tag=tags.find(tg=>tg.id===tid);return tag?`<span class="tx-tag-badge" style="background:${tag.color}">${tag.name}</span>`:''}).join('');
         const sel=searchSelectedIds.has(t.id);
-        return `<div class="search-result-item ${sel?'selected-item':''}" onclick="toggleSearchItem(${t.id},event)" data-txid="${t.id}">
-            <div class="search-checkbox ${sel?'checked':''}">${sel?'✓':''}</div>
+        return `<div class="search-result-item ${sel?'selected-item':''}" onclick="openEditFromSearch(${t.id},event)" data-txid="${t.id}">
+            <div class="search-checkbox ${sel?'checked':''}" onclick="toggleSearchItem(${t.id},event)">${sel?'✓':''}</div>
             <div style="flex:1;margin:0 10px;min-width:0;">
                 <div style="font-weight:600;font-size:14px;color:#495057">${t.categoryIcon} ${t.categoryName}</div>
                 <div class="search-result-meta">${ds}${t.description?' · '+t.description:''}</div>
@@ -1014,7 +1103,7 @@ function renderSearchResults(results){
 }
 
 function toggleSearchItem(id,event){
-    if(event.target.closest('.search-action-btn'))return;
+    event.stopPropagation();
     if(searchSelectedIds.has(id)) searchSelectedIds.delete(id); else searchSelectedIds.add(id);
     renderSearchResults(lastSearchResults); updateSearchToolbar();
 }
@@ -1025,7 +1114,7 @@ function bulkDelete(){
     if(!confirm(`Delete ${count} transaction${count>1?'s':''}? This cannot be undone.`))return;
     saveTransactionsToStorage(loadTransactions().filter(t=>!searchSelectedIds.has(t.id)));
     searchSelectedIds.clear(); showToast(`🗑️ Deleted ${count} transaction${count>1?'s':''}`);
-    runSearch(); refreshAll();
+    runSearch(searchShowAllResults); refreshAll();
 }
 
 function openBulkEdit(){
@@ -1039,7 +1128,7 @@ function openBulkEdit(){
         const cats=getCategories()[bulkSelectedType];
         catCon.innerHTML=`<div class="category-btn" style="border:2px dashed #dee2e6;color:#adb5bd;" onclick="selectBulkCategory(null)"><div class="category-icon" style="font-size:18px;">✕</div><div class="category-name">No change</div></div>`+cats.map(c=>`<div class="category-btn" id="bulkcat-${c.id}" onclick="selectBulkCategory('${c.id}')"><div class="category-icon">${c.icon}</div><div class="category-name">${c.name}</div></div>`).join('');
     } else {
-        catCon.innerHTML='<p style="font-size:12px;color:#adb5bd;grid-column:1/-1;">Mixed types — category cannot be changed</p>';
+        catCon.innerHTML='<p style="font-size:12px;color:#adb5bd;grid-column:1/-1;">Income and expense categories selected. Category cannot be changed at once.</p>';
     }
     const tags=getTags(), tg=document.getElementById('bulkTagGrid');
     tg.innerHTML=tags.length?tags.map(t=>`<span class="tag-pill" id="bulktag-${t.id}" style="background:${t.color}22;color:${t.color};" onclick="toggleBulkTag('${t.id}')">${t.name}</span>`).join(''):'<span style="font-size:12px;color:#adb5bd;">No tags yet</span>';
@@ -1078,12 +1167,13 @@ function applyBulkEdit(){
         tagsRem.forEach(tid=>{t.tags=t.tags.filter(tid2=>tid2!==tid);});
     });
     saveTransactionsToStorage(all); closeBulkEdit(); searchSelectedIds.clear();
-    showToast(`✅ Updated ${changed} transaction${changed>1?'s':''}`); runSearch(); refreshAll();
+    showToast(`✅ Updated ${changed} transaction${changed>1?'s':''}`); runSearch(searchShowAllResults); refreshAll();
 }
 
 function refreshAll(){renderTagFilterBar();if(currentTab==='overview')renderOverview();if(currentTab==='categories')renderCategoryList();}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
+initializeDefaultTags();
 updatePeriodLabel(); renderTagFilterBar(); renderOverview();
 
 // PWA
