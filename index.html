@@ -6,16 +6,16 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Personal Finance Tracker">
-    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-title" content="Ledgerly">
+    <meta name="theme-color" content="#0f172a">
     <link rel="manifest" id="pwaManifest">
-    <title>Personal Finance Tracker</title>
+    <title>Ledgerly</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'DM Sans', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cinzel Decorative', serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
             min-height: -webkit-fill-available;
             display: flex;
@@ -174,6 +174,25 @@
             .header { padding-top: max(20px, env(safe-area-inset-top)); }
             .add-transaction-buttons { padding-bottom: max(20px, env(safe-area-inset-bottom)); }
         }
+        /* Ledgerly Theme Override */
+        * { font-family: 'Cinzel Decorative', serif !important; }
+        body { color: #f8fafc; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; color: #f8fafc !important; }
+        .header-title { color: #f8fafc !important; }
+        .view-selector { background: rgba(248,250,252,0.12) !important; }
+        .view-btn { color: rgba(248,250,252,0.75) !important; }
+        .view-btn.active { background: rgba(248,250,252,0.22) !important; color: #f8fafc !important; }
+        .icon-btn { border-color: rgba(212,175,55,0.45) !important; background: rgba(212,175,55,0.12) !important; color: #f8fafc !important; }
+        .tab-btn.active { color: #d4af37 !important; border-bottom-color: #d4af37 !important; }
+        .chart-toggle-btn.active { color: #d4af37 !important; }
+        .search-selected-count { color: #d4af37 !important; }
+        .search-result-item.selected-item { border-color: #d4af37 !important; background: #fffaf0 !important; }
+        .search-checkbox.checked { background: #d4af37 !important; border-color: #d4af37 !important; color: #0f172a !important; }
+        .show-more-btn, .tag-pill-add, .search-action-btn.primary { color: #d4af37 !important; border-color: #d4af37 !important; }
+        .tag-pill.selected, .category-btn.selected { border-color: #d4af37 !important; }
+        .tag-chip.active { background: #d4af37 !important; color: #0f172a !important; border-color: #d4af37 !important; }
+        .calc-btn.operator, .save-btn { background: linear-gradient(135deg, #b8962e, #d4af37) !important; border-color: #d4af37 !important; color: #0f172a !important; }
+        .save-btn:hover { box-shadow: 0 5px 20px rgba(212,175,55,0.45) !important; }
         /* Tag filter bar */
         .tag-filter-bar { margin-top: 8px; min-height: 34px; }
         .tag-chips { display: flex; flex-wrap: nowrap; gap: 6px; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
@@ -233,7 +252,7 @@
 <div class="app-container">
     <div class="header">
         <div class="header-top">
-            <h1 class="header-title">Personal Finances</h1>
+            <h1 class="header-title">Ledgerly</h1>
             <div class="header-actions">
                 <button class="icon-btn" onclick="openSearch()" aria-label="Search">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.65" y1="16.65" x2="21" y2="21"></line></svg>
@@ -491,6 +510,7 @@ function saveNewTag() {
     renderTagsManagerList();
     renderTagsSelector();
     renderTagFilterBar();
+    refreshBulkEditOptions();
 }
 function editTag(id){
     const tag=getTags().find(t=>t.id===id);
@@ -521,6 +541,7 @@ function deleteTag(id){
     renderTagsManagerList();
     renderTagsSelector();
     refreshAll();
+    refreshBulkEditOptions();
 }
 function renderTagsManagerList(){
     const el=document.getElementById('tagsManagerList');
@@ -611,7 +632,7 @@ function renderEmojiGrid() {
 }
 function selectEmoji(e,el) { selectedEmoji=e; document.querySelectorAll('.emoji-option').forEach(x=>x.classList.remove('selected')); el.classList.add('selected'); }
 function setCustomCatType(t) { customCatType=t; document.getElementById('customCatExpenseBtn').classList.toggle('active',t==='expense'); document.getElementById('customCatIncomeBtn').classList.toggle('active',t==='income'); }
-function openCustomCategoryModal(editId,editType) {
+function openCustomCategoryModal(editId,editType,preferredType=null) {
     editingCategoryId=editId||null; editingCategoryType=editType||null;
     if(editId) {
         const cat=getCategories()[editType]?.find(c=>c.id===editId); if(!cat)return;
@@ -626,7 +647,7 @@ function openCustomCategoryModal(editId,editType) {
         document.getElementById('customCatSaveBtn').textContent='Create Category';
         document.getElementById('customCatDeleteBtn').style.display='none';
         document.getElementById('customCatName').value=''; selectedEmoji='📦';
-        customCatType=transactionType||'expense';
+        customCatType=preferredType||transactionType||'expense';
         document.getElementById('customCatTypeGroup').style.display='block';
     }
     document.getElementById('customCatExpenseBtn').classList.toggle('active',customCatType==='expense');
@@ -652,14 +673,14 @@ function saveCustomCategory() {
         custom[customCatType].push({id,name,icon:selectedEmoji,custom:true});
         saveCustomCategories(custom);
     }
-    closeCustomCategoryModal(); renderCategorySelector(); refreshAll();
+    closeCustomCategoryModal(); renderCategorySelector(); refreshAll(); refreshBulkEditOptions();
 }
 function deleteCustomCategory() {
     if(!editingCategoryId)return;
     if(!confirm('Delete this category?'))return;
     const custom=getCustomCategories();
     custom[editingCategoryType]=(custom[editingCategoryType]||[]).filter(c=>c.id!==editingCategoryId);
-    saveCustomCategories(custom); closeCustomCategoryModal(); renderCategorySelector(); refreshAll();
+    saveCustomCategories(custom); closeCustomCategoryModal(); renderCategorySelector(); refreshAll(); refreshBulkEditOptions();
 }
 
 // ── View / Period ─────────────────────────────────────────────────────────────
@@ -1160,18 +1181,42 @@ function openBulkEdit(){
     const all=loadTransactions(), selTxs=all.filter(t=>searchSelectedIds.has(t.id));
     const types=[...new Set(selTxs.map(t=>t.type))];
     bulkSelectedType=types.length===1?types[0]:null;
+    window._bulkCatSel=null; window._bulkTagsAdd=[]; window._bulkTagsRem=[];
+    document.getElementById('bulkEditModal').classList.add('active');
+    refreshBulkEditOptions();
+}
+function refreshBulkEditOptions(){
+    const modal=document.getElementById('bulkEditModal');
+    if(!modal||!modal.classList.contains('active')) return;
     const catCon=document.getElementById('bulkCategorySelector');
     if(bulkSelectedType){
         const cats=getCategories()[bulkSelectedType];
-        catCon.innerHTML=`<div class="category-btn" style="border:2px dashed #dee2e6;color:#adb5bd;" onclick="selectBulkCategory(null)"><div class="category-icon" style="font-size:18px;">✕</div><div class="category-name">No change</div></div>`+cats.map(c=>`<div class="category-btn" id="bulkcat-${c.id}" onclick="selectBulkCategory('${c.id}')"><div class="category-icon">${c.icon}</div><div class="category-name">${c.name}</div></div>`).join('');
+        catCon.innerHTML=
+            `<div class="category-btn" style="border:2px dashed #dee2e6;color:#adb5bd;" onclick="selectBulkCategory(null)"><div class="category-icon" style="font-size:18px;">X</div><div class="category-name">No change</div></div>`+
+            cats.map(c=>`<div class="category-btn" id="bulkcat-${c.id}" onclick="selectBulkCategory('${c.id}')"><div class="category-icon">${c.icon}</div><div class="category-name">${c.name}</div></div>`).join('')+
+            `<div class="add-category-btn" onclick="openBulkNewCategory()"><div class="category-icon">+</div><div class="category-name">New</div></div>`;
+        if(window._bulkCatSel){const el=document.getElementById('bulkcat-'+window._bulkCatSel);if(el)el.classList.add('selected');}
     } else {
         catCon.innerHTML='<p style="font-size:12px;color:#adb5bd;grid-column:1/-1;">Income and expense categories selected. Category cannot be changed at once.</p>';
     }
     const tags=getTags(), tg=document.getElementById('bulkTagGrid');
-    tg.innerHTML=tags.length?tags.map(t=>`<span class="tag-pill" id="bulktag-${t.id}" style="background:${t.color}22;color:${t.color};" onclick="toggleBulkTag('${t.id}')">${t.name}</span>`).join(''):'<span style="font-size:12px;color:#adb5bd;">No tags yet</span>';
-    window._bulkCatSel=null; window._bulkTagsAdd=[]; window._bulkTagsRem=[];
-    document.getElementById('bulkEditModal').classList.add('active');
+    tg.innerHTML=(tags.length
+        ? tags.map(t=>`<span class="tag-pill" id="bulktag-${t.id}" style="background:${t.color}22;color:${t.color};" onclick="toggleBulkTag('${t.id}')">${t.name}</span>`).join('')
+        : '<span style="font-size:12px;color:#adb5bd;">No tags yet</span>') + `<span class="tag-pill-add" onclick="openBulkNewTag()">+ New Tag</span>`;
+    (window._bulkTagsAdd||[]).forEach(id=>{
+        const el=document.getElementById('bulktag-'+id);
+        if(el){el.classList.add('selected');el.style.opacity='1';el.style.textDecoration='none';el.title='Will be added';}
+    });
+    (window._bulkTagsRem||[]).forEach(id=>{
+        const el=document.getElementById('bulktag-'+id);
+        if(el){el.classList.remove('selected');el.style.opacity='0.4';el.style.textDecoration='line-through';el.title='Will be removed';}
+    });
 }
+function openBulkNewCategory(){
+    if(!bulkSelectedType){showToast('Select only income or only expense to add category');return;}
+    openCustomCategoryModal(null,null,bulkSelectedType);
+}
+function openBulkNewTag(){ openTagsManager(); }
 function selectBulkCategory(id){
     window._bulkCatSel=id;
     document.querySelectorAll('#bulkCategorySelector .category-btn').forEach(el=>el.classList.remove('selected'));
@@ -1215,13 +1260,14 @@ updatePeriodLabel(); renderTagFilterBar(); renderOverview();
 
 // PWA
 (function(){
-    const manifest={name:'Personal Finance Tracker',short_name:'Finance',start_url:'.',display:'standalone',background_color:'#667eea',theme_color:'#667eea',icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%23667eea'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='120' fill='white'%3E%F0%9F%92%B0%3C/text%3E%3C/svg%3E",sizes:'192x192',type:'image/svg+xml'}]};
+    const manifest={name:'Ledgerly',short_name:'Ledgerly',start_url:'.',display:'standalone',background_color:'#0f172a',theme_color:'#0f172a',icons:[{src:"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='36' fill='%230f172a'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='120' fill='%23d4af37'%3E%F0%9F%92%B0%3C/text%3E%3C/svg%3E",sizes:'192x192',type:'image/svg+xml'}]};
     document.getElementById('pwaManifest').href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));
 })();
 if('serviceWorker' in navigator){
-    const sw=`const C='pft-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([self.location.href])));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)));});`;
+    const sw=`const C='pft-v4';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll([self.location.href])));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();});self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request)));});`;
     navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'application/javascript'})),{scope:'./'}).catch(()=>{});
 }
 </script>
 </body>
 </html>
+
