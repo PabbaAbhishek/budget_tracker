@@ -653,12 +653,159 @@
                 padding-bottom: max(20px, env(safe-area-inset-bottom));
             }
         }
+
+        /* ── Tag filter bar ── */
+        .tag-filter-bar {
+            margin-top: 8px;
+            min-height: 0;
+        }
+        .tag-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+        .tag-chip {
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.85);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .tag-chip:hover { background: rgba(255,255,255,0.22); }
+        .tag-chip.active {
+            background: white;
+            color: #495057;
+            border-color: white;
+        }
+        .tag-chip-clear {
+            padding: 4px 12px;
+            border-radius: 20px;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            background: transparent;
+            color: rgba(255,255,255,0.6);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* ── Tags selector in modal ── */
+        .tags-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            min-height: 36px;
+        }
+        .tag-pill {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .tag-pill.selected { border-color: #333; }
+        .tag-pill-add {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px dashed #dee2e6;
+            background: #f8f9fa;
+            color: #667eea;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* ── Tag color picker ── */
+        .tag-color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .color-swatch {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.15s;
+        }
+        .color-swatch.selected { border-color: #333; transform: scale(1.15); }
+
+        /* ── Tag active filter banner ── */
+        .tag-active-banner {
+            background: linear-gradient(135deg, #667eea22, #764ba222);
+            border: 1.5px solid #667eea44;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 12px;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 8px 16px 0;
+        }
+        .tag-active-banner strong { color: #667eea; }
+
+        /* ── Pie chart tooltip ── */
+        .chart-tooltip {
+            position: absolute;
+            background: rgba(30,30,30,0.88);
+            color: white;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-family: 'DM Sans', sans-serif;
+            pointer-events: none;
+            display: none;
+            white-space: nowrap;
+            z-index: 10;
+            transform: translate(-50%, -110%);
+        }
+        .chart-container { position: relative; }
+
+        /* ── Search results ── */
+        .search-result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            margin-bottom: 7px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .search-result-item:hover { background: #e9ecef; }
+        .search-result-meta { font-size: 11px; color: #6c757d; margin-top: 2px; }
+        .search-empty { text-align:center; padding: 30px; color: #adb5bd; font-size: 14px; }
+
+        /* ── Tag badges on transactions ── */
+        .tx-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+        .tx-tag-badge {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 7px;
+            border-radius: 10px;
+            color: white;
+            letter-spacing: 0.3px;
+        }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="header">
         <div class="header-actions">
+            <button class="icon-btn" onclick="openSearch()" title="Search">🔍</button>
             <button class="icon-btn" onclick="openSettings()" title="Settings">⚙️</button>
         </div>
         <h1>💰 Budget Tracker Pro</h1>
@@ -674,6 +821,11 @@
             <button class="nav-btn" onclick="changePeriod(-1)">◀</button>
             <span id="currentPeriodLabel">February 2026</span>
             <button class="nav-btn" onclick="changePeriod(1)">▶</button>
+        </div>
+
+        <!-- Tag filter chips -->
+        <div class="tag-filter-bar" id="tagFilterBar">
+            <div class="tag-chips" id="tagFilterChips"></div>
         </div>
     </div>
 
@@ -753,6 +905,11 @@
             <input type="text" id="descriptionInput" placeholder="Add a note...">
         </div>
 
+        <div class="input-group">
+            <label>Tags <span style="font-weight:400;color:#adb5bd;font-size:11px;">tap to select · tap + to create</span></label>
+            <div class="tags-selector" id="tagsSelector"></div>
+        </div>
+
         <div class="amount-display" id="amountDisplay">₹0</div>
 
         <div class="calculator-grid">
@@ -783,10 +940,40 @@
     </div>
 </div>
 
-<!-- Trend modal removed - trend is now inline in category expand -->
+<!-- Search Modal -->
+<div class="modal" id="searchModal">
+    <div class="modal-content" style="max-height:90vh;">
+        <div class="modal-header">
+            <h3>🔍 Search</h3>
+            <button class="close-btn" onclick="closeSearch()">×</button>
+        </div>
+        <div class="input-group" style="margin-bottom:12px;">
+            <input type="text" id="searchInput" placeholder="Search transactions..." oninput="runSearch()" autocomplete="off" style="font-size:16px;">
+        </div>
+        <div id="searchResults" style="max-height:65vh;overflow-y:auto;"></div>
+    </div>
+</div>
+
+<!-- Tags Manager Modal -->
+<div class="modal" id="tagsManagerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Create Tag</h3>
+            <button class="close-btn" onclick="closeTagsManager()">×</button>
+        </div>
+        <div class="input-group">
+            <label>Tag Name</label>
+            <input type="text" id="newTagName" placeholder="e.g. Stocks, Vacation, Side Hustle" maxlength="24">
+        </div>
+        <div class="input-group">
+            <label>Color</label>
+            <div class="tag-color-picker" id="tagColorPicker"></div>
+        </div>
+        <button class="save-btn" onclick="saveNewTag()">Create Tag</button>
+    </div>
+</div>
 
 
-<!-- Settings Modal -->
 <div class="modal" id="settingsModal">
     <div class="modal-content">
         <div class="modal-header">
@@ -837,6 +1024,7 @@
 <script>
 // ── State ────────────────────────────────────────────────────────────────────
 let currentDate = new Date();
+let activeTagFilter = null; // tag id or null
 let currentView = 'month'; // month | quarter | year | all
 let currentAmount = '';
 let currentExpression = '';
@@ -847,6 +1035,109 @@ let currentTab = 'overview';
 let selectedEmoji = '📦';
 let customCatType = 'expense';
 let chartMode = 'expense'; // 'expense' | 'income'
+let selectedTags = []; // tags selected on current transaction being edited/added
+
+// ── Tags storage ──────────────────────────────────────────────────────────────
+const TAG_COLORS = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#1abc9c','#3498db','#9b59b6','#e91e63','#00bcd4','#607d8b'];
+let selectedTagColor = TAG_COLORS[2];
+
+function getTags() {
+    const s = localStorage.getItem('budgetTags');
+    return s ? JSON.parse(s) : [];
+}
+function saveTags(tags) { localStorage.setItem('budgetTags', JSON.stringify(tags)); }
+
+// ── Tags Manager ──────────────────────────────────────────────────────────────
+function openTagsManager() {
+    selectedTagColor = TAG_COLORS[2];
+    document.getElementById('newTagName').value = '';
+    renderTagColorPicker();
+    document.getElementById('tagsManagerModal').classList.add('active');
+}
+function closeTagsManager() { document.getElementById('tagsManagerModal').classList.remove('active'); }
+
+function renderTagColorPicker() {
+    document.getElementById('tagColorPicker').innerHTML = TAG_COLORS.map(c => `
+        <div class="color-swatch ${c === selectedTagColor ? 'selected' : ''}" style="background:${c}" onclick="selectTagColor('${c}')"></div>
+    `).join('');
+}
+function selectTagColor(c) {
+    selectedTagColor = c;
+    renderTagColorPicker();
+}
+function saveNewTag() {
+    const name = document.getElementById('newTagName').value.trim();
+    if (!name) { alert('Enter a tag name'); return; }
+    const tags = getTags();
+    if (tags.find(t => t.name.toLowerCase() === name.toLowerCase())) { alert('Tag already exists'); return; }
+    const id = 'tag_' + Date.now();
+    tags.push({ id, name, color: selectedTagColor });
+    saveTags(tags);
+    closeTagsManager();
+    renderTagsSelector();
+    renderTagFilterBar();
+}
+
+// ── Tags selector in transaction modal ────────────────────────────────────────
+function renderTagsSelector() {
+    const tags = getTags();
+    const el = document.getElementById('tagsSelector');
+    if (!el) return;
+    el.innerHTML = tags.map(t => `
+        <span class="tag-pill ${selectedTags.includes(t.id) ? 'selected' : ''}"
+            style="background:${t.color}22;color:${t.color};"
+            onclick="toggleTransactionTag('${t.id}')">${t.name}</span>
+    `).join('') + `<span class="tag-pill-add" onclick="openTagsManager()">＋ New</span>`;
+}
+function toggleTransactionTag(tagId) {
+    if (selectedTags.includes(tagId)) selectedTags = selectedTags.filter(i => i !== tagId);
+    else selectedTags.push(tagId);
+    renderTagsSelector();
+}
+
+// ── Tag filter bar (in header) ────────────────────────────────────────────────
+function renderTagFilterBar() {
+    const tags = getTags();
+    const bar = document.getElementById('tagFilterChips');
+    if (!bar) return;
+    if (tags.length === 0) { bar.innerHTML = ''; return; }
+
+    bar.innerHTML = tags.map(t => `
+        <button class="tag-chip ${activeTagFilter === t.id ? 'active' : ''}"
+            style="${activeTagFilter === t.id ? 'background:'+t.color+';border-color:'+t.color+';color:white;' : ''}"
+            onclick="setTagFilter('${t.id}')">${t.name}</button>
+    `).join('');
+
+    if (activeTagFilter) {
+        bar.innerHTML += `<button class="tag-chip-clear" onclick="clearTagFilter()">✕ Clear</button>`;
+    }
+}
+function setTagFilter(tagId) {
+    activeTagFilter = activeTagFilter === tagId ? null : tagId;
+    renderTagFilterBar();
+    refreshAll();
+}
+function clearTagFilter() {
+    activeTagFilter = null;
+    renderTagFilterBar();
+    refreshAll();
+}
+
+// ── Period transactions (with tag filter) ─────────────────────────────────────
+function getPeriodTransactions() {
+    let all = loadTransactions();
+    if (currentView !== 'all') {
+        all = all.filter(t => {
+            const d = new Date(t.date);
+            if (currentView === 'month') return d.getMonth() === currentDate.getMonth() && d.getFullYear() === currentDate.getFullYear();
+            if (currentView === 'quarter') return Math.floor(d.getMonth()/3) === Math.floor(currentDate.getMonth()/3) && d.getFullYear() === currentDate.getFullYear();
+            if (currentView === 'year') return d.getFullYear() === currentDate.getFullYear();
+            return true;
+        });
+    }
+    if (activeTagFilter) all = all.filter(t => Array.isArray(t.tags) && t.tags.includes(activeTagFilter));
+    return all;
+}
 
 // ── Number formatting (Indian) ────────────────────────────────────────────────
 function formatINR(n) {
@@ -1095,25 +1386,6 @@ function updatePeriodLabel() {
     }
 }
 
-function getPeriodTransactions() {
-    const all = loadTransactions();
-    if (currentView === 'all') return all;
-
-    return all.filter(t => {
-        const d = new Date(t.date);
-        if (currentView === 'month') {
-            return d.getMonth() === currentDate.getMonth() && d.getFullYear() === currentDate.getFullYear();
-        } else if (currentView === 'quarter') {
-            const tQ = Math.floor(d.getMonth() / 3);
-            const cQ = Math.floor(currentDate.getMonth() / 3);
-            return tQ === cQ && d.getFullYear() === currentDate.getFullYear();
-        } else if (currentView === 'year') {
-            return d.getFullYear() === currentDate.getFullYear();
-        }
-        return true;
-    });
-}
-
 // ── Storage ───────────────────────────────────────────────────────────────────
 function loadTransactions() {
     const stored = localStorage.getItem('budgetTrackerData');
@@ -1161,7 +1433,23 @@ function renderOverview() {
     balEl.textContent = formatINR(balance);
     balEl.className = balance >= 0 ? 'balance-amount' : 'balance-amount negative';
 
-    // Keep toggle button states in sync
+    // Tag active banner
+    const existing = document.getElementById('tagActiveBanner');
+    if (existing) existing.remove();
+    if (activeTagFilter) {
+        const tag = getTags().find(t => t.id === activeTagFilter);
+        if (tag) {
+            const banner = document.createElement('div');
+            banner.id = 'tagActiveBanner';
+            banner.className = 'tag-active-banner';
+            banner.style.borderColor = tag.color + '66';
+            banner.style.background = tag.color + '11';
+            banner.innerHTML = `<span>Filtered by tag: <strong style="color:${tag.color}">${tag.name}</strong></span>
+                <span style="font-size:10px;color:#adb5bd">showing tagged only</span>`;
+            document.getElementById('overviewTab').querySelector('.balance-section').after(banner);
+        }
+    }
+
     document.getElementById('chartExpenseBtn').classList.toggle('active', chartMode === 'expense');
     document.getElementById('chartExpenseBtn').classList.toggle('expense-mode', chartMode === 'expense');
     document.getElementById('chartIncomeBtn').classList.toggle('active', chartMode === 'income');
@@ -1170,22 +1458,32 @@ function renderOverview() {
     renderChart(transactions);
 }
 
+// Pie slice data for hit-testing tooltips
+let _pieSlices = [];
+
 function renderChart(transactions) {
     const canvas = document.getElementById('expenseChart');
     const ctx = canvas.getContext('2d');
     const filtered = transactions.filter(t => t.type === chartMode);
 
-    canvas.width = 220;
-    canvas.height = 220;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Set display size matching device pixel ratio for crisp rendering
+    const DPR = window.devicePixelRatio || 1;
+    const SIZE = 220;
+    canvas.style.width = SIZE + 'px';
+    canvas.style.height = SIZE + 'px';
+    canvas.width = SIZE * DPR;
+    canvas.height = SIZE * DPR;
+    ctx.scale(DPR, DPR);
+    ctx.clearRect(0, 0, SIZE, SIZE);
 
     if (filtered.length === 0) {
         ctx.fillStyle = '#adb5bd';
         ctx.font = '13px DM Sans, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('No ' + chartMode + ' data', canvas.width / 2, canvas.height / 2);
+        ctx.fillText('No ' + chartMode + ' data', SIZE / 2, SIZE / 2);
         document.getElementById('chartLegend').innerHTML = '';
+        _pieSlices = [];
         return;
     }
 
@@ -1194,7 +1492,7 @@ function renderChart(transactions) {
     const categories = getCategories();
     filtered.forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
 
-    // Sort by amount descending
+    // Sort by amount descending — ALL categories
     let data = Object.entries(catTotals).map(([catId, amount]) => {
         const cat = categories[chartMode]?.find(c => c.id === catId)
                  || categories.expense.find(c => c.id === catId)
@@ -1205,64 +1503,53 @@ function renderChart(transactions) {
 
     const total = data.reduce((s, d) => s + d.amount, 0);
 
-    // For the PIE: show top 3, group rest as "Others"
-    const TOP_N = 3;
-    let pieData = data.slice(0, TOP_N);
-    if (data.length > TOP_N) {
-        const othersTotal = data.slice(TOP_N).reduce((s, d) => s + d.amount, 0);
-        pieData.push({ id: '__others__', category: 'Others', icon: '📦', amount: othersTotal });
-    }
+    // Rich color palette — enough for 20 categories
+    const COLORS = chartMode === 'expense'
+        ? ['#e74c3c','#e67e22','#f1c40f','#16a085','#8e44ad','#2980b9','#d35400','#27ae60','#c0392b','#7f8c8d',
+           '#fd79a8','#6c5ce7','#00b894','#fdcb6e','#e17055','#74b9ff','#a29bfe','#55efc4','#ffeaa7','#dfe6e9']
+        : ['#27ae60','#2980b9','#8e44ad','#16a085','#f39c12','#d35400','#1abc9c','#3498db','#9b59b6','#e67e22',
+           '#00b894','#6c5ce7','#00cec9','#fdcb6e','#fd79a8','#74b9ff','#a29bfe','#55efc4','#ffeaa7','#81ecec'];
 
-    const colors = chartMode === 'expense'
-        ? ['#FF6384', '#FF9F40', '#FFCE56', '#c8c8c8']
-        : ['#36A2EB', '#4BC0C0', '#9966FF', '#c8c8c8'];
-
-    const cx = canvas.width / 2, cy = canvas.height / 2, r = 100;
+    const cx = SIZE / 2, cy = SIZE / 2, r = 105, innerR = r * 0.45;
     let angle = -Math.PI / 2;
+    _pieSlices = [];
 
-    pieData.forEach((item, i) => {
+    data.forEach((item, i) => {
         const slice = (item.amount / total) * 2 * Math.PI;
-        ctx.fillStyle = colors[i % colors.length];
+        const color = COLORS[i % COLORS.length];
+
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, r, angle, angle + slice);
         ctx.closePath();
         ctx.fill();
 
-        // White separator line
+        // White gap between slices
         ctx.strokeStyle = 'white';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+        ctx.lineWidth = 1.5;
         ctx.stroke();
 
+        _pieSlices.push({ startAngle: angle, endAngle: angle + slice, color, ...item });
         angle += slice;
     });
 
-    // Draw donut hole
+    // Donut hole — clean white, NO text inside
     ctx.fillStyle = 'white';
     ctx.beginPath();
-    ctx.arc(cx, cy, r * 0.42, 0, Math.PI * 2);
+    ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
     ctx.fill();
 
-    // Center label
-    ctx.fillStyle = chartMode === 'expense' ? '#dc3545' : '#28a745';
-    ctx.font = 'bold 11px DM Sans, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(chartMode === 'expense' ? 'SPENT' : 'EARNED', cx, cy - 10);
-    ctx.fillStyle = '#495057';
-    ctx.font = 'bold 13px DM Mono, monospace';
-    ctx.fillText(formatINR(total), cx, cy + 10);
+    // Attach interactive tooltip
+    attachPieTooltip(canvas, cx, cy, r, innerR);
 
-    // Legend: ALL categories sorted highest to lowest (not just top 3)
+    // Legend: all categories sorted
     document.getElementById('chartLegend').innerHTML = data.map((item, i) => {
-        const color = i < TOP_N ? colors[i] : '#c8c8c8';
+        const color = COLORS[i % COLORS.length];
         return `
         <div class="legend-item" onclick="jumpToCategory('${item.id}')">
             <div class="legend-left">
-                <div class="legend-color" style="background:${color};border-radius:50%;"></div>
+                <div class="legend-color" style="background:${color};border-radius:50%;width:12px;height:12px;flex-shrink:0;"></div>
                 <span class="legend-name">${item.icon} ${item.category}</span>
             </div>
             <div class="legend-right">
@@ -1271,6 +1558,74 @@ function renderChart(transactions) {
             </div>
         </div>`;
     }).join('');
+}
+
+function attachPieTooltip(canvas, cx, cy, r, innerR) {
+    // Remove old tooltip & listener
+    const old = canvas.parentElement.querySelector('.chart-tooltip');
+    if (old) old.remove();
+    canvas._pieHandler && canvas.removeEventListener('mousemove', canvas._pieHandler);
+    canvas._pieTouchHandler && canvas.removeEventListener('touchstart', canvas._pieTouchHandler);
+
+    const tip = document.createElement('div');
+    tip.className = 'chart-tooltip';
+    canvas.parentElement.appendChild(tip);
+
+    function showTipAt(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = 220 / rect.width;
+        const x = (clientX - rect.left) * scaleX - cx;
+        const y = (clientY - rect.top) * scaleX - cy;
+        const dist = Math.sqrt(x*x + y*y);
+
+        if (dist < innerR || dist > r) { tip.style.display = 'none'; return; }
+
+        let ang = Math.atan2(y, x);
+        if (ang < -Math.PI/2) ang += 2 * Math.PI; // normalize to match our start
+
+        const hit = _pieSlices.find(s => {
+            let sa = s.startAngle, ea = s.endAngle;
+            if (sa < -Math.PI/2) { sa += 2*Math.PI; ea += 2*Math.PI; }
+            // Also handle wrap-around
+            return (ang >= sa && ang <= ea) ||
+                   (ang + 2*Math.PI >= sa && ang + 2*Math.PI <= ea);
+        });
+
+        if (!hit) { tip.style.display = 'none'; return; }
+        const total = _pieSlices.reduce((s,d)=>s+d.amount,0);
+        tip.innerHTML = `<b>${hit.icon} ${hit.category}</b><br>${formatINR(hit.amount)} · ${((hit.amount/total)*100).toFixed(1)}%`;
+        tip.style.display = 'block';
+        // Position relative to canvas container
+        const relX = clientX - rect.left;
+        const relY = clientY - rect.top;
+        tip.style.left = relX + 'px';
+        tip.style.top = relY + 'px';
+    }
+
+    canvas._pieHandler = e => showTipAt(e.clientX, e.clientY);
+    canvas._pieTouchHandler = e => { e.preventDefault(); if(e.touches[0]) showTipAt(e.touches[0].clientX, e.touches[0].clientY); };
+    canvas.addEventListener('mousemove', canvas._pieHandler);
+    canvas.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    canvas.addEventListener('touchstart', canvas._pieTouchHandler, {passive:false});
+    canvas.addEventListener('touchend', () => setTimeout(()=>{ tip.style.display='none'; }, 1200));
+
+    // Tap to jump on mobile
+    canvas.addEventListener('click', e => {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = 220 / rect.width;
+        const x = (e.clientX - rect.left) * scaleX - cx;
+        const y = (e.clientY - rect.top) * scaleX - cy;
+        const dist = Math.sqrt(x*x + y*y);
+        if (dist < innerR || dist > r) return;
+        let ang = Math.atan2(y, x);
+        if (ang < -Math.PI/2) ang += 2*Math.PI;
+        const hit = _pieSlices.find(s => {
+            let sa = s.startAngle, ea = s.endAngle;
+            if (sa < -Math.PI/2) { sa += 2*Math.PI; ea += 2*Math.PI; }
+            return (ang >= sa && ang <= ea) || (ang + 2*Math.PI >= sa && ang + 2*Math.PI <= ea);
+        });
+        if (hit) jumpToCategory(hit.id);
+    });
 }
 
 function jumpToCategory(categoryId) {
@@ -1330,12 +1685,14 @@ function renderCategoryList() {
                 </div>
                 ${cat.transactions.sort((a,b)=>new Date(b.date)-new Date(a.date)).map(t => {
                     const ds = new Date(t.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year: (currentView==='year'||currentView==='all')?'numeric':undefined });
+                    const tags = getTags();
+                    const txTags = (t.tags||[]).map(tid=>{ const tag=tags.find(tg=>tg.id===tid); return tag ? `<span class="tx-tag-badge" style="background:${tag.color}">${tag.name}</span>` : ''; }).join('');
                     return `
                         <div class="transaction-item" onclick="editTransaction(${t.id})">
                             <div class="transaction-info">
                                 <div class="transaction-details">
-                                    <div class="transaction-date">${ds}</div>
-                                    ${t.description ? `<div class="transaction-description">${t.description}</div>` : ''}
+                                    <div class="transaction-date">${ds}${t.description ? ' · <span style="font-style:italic">' + t.description + '</span>' : ''}</div>
+                                    ${txTags ? `<div class="tx-tags">${txTags}</div>` : ''}
                                 </div>
                             </div>
                             <div class="transaction-amount ${t.type}">${t.type==='expense'?'−':'+'}${formatINR(t.amount)}</div>
@@ -1457,6 +1814,7 @@ function openAddTransaction(type) {
     editingTransaction = null;
     transactionType = type;
     selectedCategory = null;
+    selectedTags = [];
     currentAmount = '';
     currentExpression = '';
 
@@ -1468,7 +1826,9 @@ function openAddTransaction(type) {
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.type-btn.${type}`).classList.add('active');
 
+    showingMoreCategories = false;
     renderCategorySelector();
+    renderTagsSelector();
     updateAmountDisplay();
     document.getElementById('transactionModal').classList.add('active');
 }
@@ -1481,6 +1841,7 @@ function editTransaction(id) {
     editingTransaction = tx;
     transactionType = tx.type;
     selectedCategory = tx.category;
+    selectedTags = Array.isArray(tx.tags) ? [...tx.tags] : [];
     currentAmount = tx.amount.toString();
     currentExpression = currentAmount;
 
@@ -1492,7 +1853,9 @@ function editTransaction(id) {
     document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.type-btn.${transactionType}`).classList.add('active');
 
+    showingMoreCategories = false;
     renderCategorySelector();
+    renderTagsSelector();
     updateAmountDisplay();
     document.getElementById('transactionModal').classList.add('active');
 }
@@ -1626,6 +1989,7 @@ function saveTransaction() {
                 categoryName: cat.name,
                 categoryIcon: cat.icon,
                 description,
+                tags: [...selectedTags],
                 date: transactionDate.toISOString(),
                 month: transactionDate.getMonth(),
                 year: transactionDate.getFullYear()
@@ -1640,6 +2004,7 @@ function saveTransaction() {
             categoryName: cat.name,
             categoryIcon: cat.icon,
             description,
+            tags: [...selectedTags],
             date: transactionDate.toISOString(),
             month: transactionDate.getMonth(),
             year: transactionDate.getFullYear()
@@ -1773,14 +2138,57 @@ function parseCSV(text) {
     alert(`✅ Imported ${count} transactions!`);
 }
 
+// ── Search ────────────────────────────────────────────────────────────────────
+function openSearch() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchResults').innerHTML = '<div class="search-empty">Start typing to search transactions</div>';
+    document.getElementById('searchModal').classList.add('active');
+    setTimeout(() => document.getElementById('searchInput').focus(), 100);
+}
+function closeSearch() { document.getElementById('searchModal').classList.remove('active'); }
+
+function runSearch() {
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+    const container = document.getElementById('searchResults');
+    if (!q) { container.innerHTML = '<div class="search-empty">Start typing to search transactions</div>'; return; }
+
+    const all = loadTransactions();
+    const tags = getTags();
+    const results = all.filter(t =>
+        (t.categoryName || '').toLowerCase().includes(q) ||
+        (t.description || '').toLowerCase().includes(q) ||
+        (t.amount.toString()).includes(q) ||
+        (t.tags || []).some(tid => { const tag = tags.find(tg=>tg.id===tid); return tag && tag.name.toLowerCase().includes(q); })
+    ).sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 50);
+
+    if (!results.length) { container.innerHTML = '<div class="search-empty">No transactions found</div>'; return; }
+
+    container.innerHTML = results.map(t => {
+        const ds = new Date(t.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+        const txTags = (t.tags||[]).map(tid=>{ const tag=tags.find(tg=>tg.id===tid); return tag ? `<span class="tx-tag-badge" style="background:${tag.color}">${tag.name}</span>` : ''; }).join('');
+        return `<div class="search-result-item" onclick="closeSearch();editTransaction(${t.id})">
+            <div style="flex:1">
+                <div style="font-weight:600;font-size:14px;color:#495057">${t.categoryIcon} ${t.categoryName}</div>
+                <div class="search-result-meta">${ds}${t.description ? ' · ' + t.description : ''}</div>
+                ${txTags ? `<div class="tx-tags" style="margin-top:4px">${txTags}</div>` : ''}
+            </div>
+            <div style="font-weight:700;font-family:'DM Mono',monospace;font-size:14px;color:${t.type==='expense'?'#dc3545':'#28a745'}">
+                ${t.type==='expense'?'−':'+'}${formatINR(t.amount)}
+            </div>
+        </div>`;
+    }).join('');
+}
+
 // ── Refresh ───────────────────────────────────────────────────────────────────
 function refreshAll() {
+    renderTagFilterBar();
     if (currentTab === 'overview') renderOverview();
     if (currentTab === 'categories') renderCategoryList();
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 updatePeriodLabel();
+renderTagFilterBar();
 renderOverview();
 
 // ── PWA: Inject manifest inline ───────────────────────────────────────────────
