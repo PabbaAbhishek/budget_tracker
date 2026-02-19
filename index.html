@@ -116,9 +116,9 @@
         .category-item.expanded .category-transactions { display: block; }
         .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 20px; padding: 28px; max-width: 400px; width: 100%; max-height: 88vh; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 20px; padding: 28px; max-width: 400px; width: 100%; max-height: 88vh; overflow-y: auto; color: #212529; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
-        .modal-header h3 { font-size: 20px; font-weight: 700; }
+        .modal-header h3 { font-size: 20px; font-weight: 700; color: #212529; }
         .close-btn { background: none; border: none; font-size: 26px; color: #6c757d; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; transition: all 0.3s; }
         .close-btn:hover { background: #f8f9fa; color: #495057; }
         .type-selector { display: flex; gap: 10px; margin-bottom: 18px; }
@@ -131,6 +131,11 @@
         .input-group label { display: block; font-size: 13px; font-weight: 600; color: #495057; margin-bottom: 7px; }
         .input-group input, .input-group select { width: 100%; padding: 11px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; }
         .input-group input:focus { outline: none; border-color: #667eea; }
+        .description-input-wrap { position: relative; }
+        .desc-suggestions { position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff; border: 1.5px solid #dee2e6; border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); max-height: 180px; overflow-y: auto; z-index: 25; display: none; }
+        .desc-suggestion-item { padding: 9px 11px; font-size: 13px; color: #495057; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+        .desc-suggestion-item:last-child { border-bottom: 0; }
+        .desc-suggestion-item:hover { background: #f8f9fa; }
         .category-selector-wrapper { margin-bottom: 20px; }
         .category-row-top { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 8px; }
         .category-row-scroll { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
@@ -340,7 +345,13 @@
             </div>
         </div>
         <div class="input-group"><label>Date</label><input type="date" id="dateInput"/></div>
-        <div class="input-group"><label>Description (Optional)</label><input type="text" id="descriptionInput" placeholder="Add a note..."></div>
+        <div class="input-group">
+            <label>Description (Optional)</label>
+            <div class="description-input-wrap">
+                <input type="text" id="descriptionInput" placeholder="Add a note..." autocomplete="off" oninput="handleDescriptionInput()" onfocus="handleDescriptionInput()" onkeydown="handleDescriptionKeydown(event)">
+                <div id="descSuggestions" class="desc-suggestions"></div>
+            </div>
+        </div>
         <div class="input-group">
             <label>Tags <span style="font-weight:400;color:#adb5bd;font-size:11px;">tap to select · + to create</span></label>
             <div class="tags-selector" id="tagsSelector"></div>
@@ -417,9 +428,9 @@
     <div class="modal-content">
         <div class="modal-header"><h3>Settings & Data</h3><button class="close-btn" onclick="closeSettings()">×</button></div>
         <input type="file" id="csvFileInput" accept=".csv" style="display:none;" onchange="handleCSVImport(event)">
-        <button class="save-btn" style="margin-bottom:12px;" onclick="document.getElementById('csvFileInput').click()">📁 Import CSV</button>
-        <button class="save-btn" style="margin-bottom:12px;background:linear-gradient(135deg,#00b894,#00cec9);" onclick="exportCSV()">⬇️ Export All Data as CSV</button>
-        <button class="delete-btn" onclick="clearAllData()">🗑️ Clear All Data</button>
+        <button class="save-btn" style="margin-bottom:12px;" onclick="document.getElementById('csvFileInput').click()">Import CSV</button>
+        <button class="save-btn" style="margin-bottom:12px;background:linear-gradient(135deg,#00b894,#00cec9);" onclick="exportCSV()">Export all transactions to CSV</button>
+        <button class="delete-btn" onclick="clearAllData()">Clear All Data</button>
     </div>
 </div>
 
@@ -598,6 +609,56 @@ function renderTagFilterBar() {
 }
 function setTagFilter(id) { activeTagFilter=activeTagFilter===id?null:id; renderTagFilterBar(); refreshAll(); }
 function clearTagFilter() { activeTagFilter=null; renderTagFilterBar(); refreshAll(); }
+
+// Description autocomplete
+function getDescriptionSuggestions(q='') {
+    const query=(q||'').trim().toLowerCase();
+    const seen=new Set(), out=[];
+    const all=loadTransactions().slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+    for(const t of all){
+        const raw=(t.description||'').trim();
+        if(!raw) continue;
+        const key=raw.toLowerCase();
+        if(seen.has(key)) continue;
+        if(query && !key.includes(query)) continue;
+        seen.add(key); out.push(raw);
+        if(out.length>=8) break;
+    }
+    return out;
+}
+function renderDescriptionSuggestions(items) {
+    const box=document.getElementById('descSuggestions');
+    if(!box) return;
+    if(!items.length){box.style.display='none';box.innerHTML='';return;}
+    box.innerHTML=items.map(v=>{
+        const safeText=v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const encoded=encodeURIComponent(v);
+        return `<div class="desc-suggestion-item" data-value="${encoded}" onclick="selectDescriptionSuggestion(decodeURIComponent(this.dataset.value))">${safeText}</div>`;
+    }).join('');
+    box.style.display='block';
+}
+function handleDescriptionInput() {
+    const input=document.getElementById('descriptionInput');
+    if(!input) return;
+    renderDescriptionSuggestions(getDescriptionSuggestions(input.value));
+}
+function handleDescriptionKeydown(e){
+    if(e.key==='Escape') hideDescriptionSuggestions();
+    if(e.key==='Enter'){
+        const first=document.querySelector('#descSuggestions .desc-suggestion-item');
+        if(first){ e.preventDefault(); first.click(); }
+    }
+}
+function selectDescriptionSuggestion(v){
+    const input=document.getElementById('descriptionInput');
+    if(!input) return;
+    input.value=v; hideDescriptionSuggestions(); input.focus();
+}
+function hideDescriptionSuggestions(){
+    const box=document.getElementById('descSuggestions');
+    if(!box) return;
+    box.style.display='none'; box.innerHTML='';
+}
 
 // ── Transactions ──────────────────────────────────────────────────────────────
 function getPeriodTransactions() {
@@ -1099,6 +1160,7 @@ function openAddTransaction(type) {
     document.getElementById('deleteBtn').style.display='none';
     document.getElementById('dateInput').value=new Date().toISOString().split('T')[0];
     document.getElementById('descriptionInput').value='';
+    hideDescriptionSuggestions();
     document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector(`.type-btn.${type}`).classList.add('active');
     showingMoreCategories=false; renderCategorySelector(); renderTagsSelector(); updateAmountDisplay();
@@ -1112,6 +1174,7 @@ function editTransaction(id) {
     document.getElementById('modalTitle').textContent='Edit Transaction';
     document.getElementById('deleteBtn').style.display='block';
     document.getElementById('descriptionInput').value=tx.description||'';
+    hideDescriptionSuggestions();
     document.getElementById('dateInput').value=new Date(tx.date).toISOString().split('T')[0];
     document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('active'));
     document.querySelector(`.type-btn.${transactionType}`).classList.add('active');
@@ -1414,6 +1477,10 @@ function refreshAll(){renderTagFilterBar();if(currentTab==='overview')renderOver
 // ── Init ──────────────────────────────────────────────────────────────────────
 initializeDefaultTags();
 updateCurrencyButton();
+document.addEventListener('click',e=>{
+    const wrap=document.querySelector('.description-input-wrap');
+    if(wrap && !wrap.contains(e.target)) hideDescriptionSuggestions();
+});
 document.getElementById('periodNavigator').style.display=currentView==='all'?'none':'flex';
 updatePeriodLabel(); renderTagFilterBar(); renderOverview();
 
